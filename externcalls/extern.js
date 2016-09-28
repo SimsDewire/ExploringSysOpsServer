@@ -17,11 +17,14 @@ var bodyParser = require('body-parser')
             console.log(data);
         }
 
-router.fetchget(function (apicall,cb){
+router.use(function fetchget(apicall,cb){
 	httpGetasync(apicall, function(data){
 		var tempholder = JSON.parse(data);
 	})
 
 });
 
+
+
+module.exports = router;
 
