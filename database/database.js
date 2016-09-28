@@ -1,11 +1,13 @@
-var MongoClient = require('mongodb').MongoClient;
+var mongoose = require("mongoose");
+
 // Connection URL
 var url = 'mongodb://localhost:27017/myproject';
 
-// Use connect method to connect to the server
-MongoClient.connect(url, function(err, db) {
-  console.log("Connected successfully to server");
+mongoose.connect(url);
 
-  db.close();
+var db = mongoose.connection;
+
+db.on("error", console.error.bind(console, "connection error"));
+db.once("open", function(callback) {
+	console.log("Connection succeeded.");
 });
-
