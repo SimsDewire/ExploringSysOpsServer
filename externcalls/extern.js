@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
-var bodyParser = require('body-parser')
+var bodyParser = require('body-parser');
+var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+var xhr = new XMLHttpRequest();
 
         function httpGetasync(theUrl, callback) {
             var xmlHttp = new XMLHttpRequest();
@@ -16,15 +18,27 @@ var bodyParser = require('body-parser')
     	function callback(data) {
             console.log(data);
         }
-
+/*
 router.use(function fetchget(apicall,cb){
 	httpGetasync(apicall, function(data){
 		var tempholder = JSON.parse(data);
+		console.log(tempholder);
 	})
 
 });
+*/
+module.exports={
 
 
+test: function fetchget(apicall,cb){
+			console.log("does it work?");
 
-module.exports = router;
+	httpGetasync(apicall, function(data){
+		var tempholder = JSON.parse(data);
+		console.log(tempholder);
+	})
+}
+};
+
+//module.exports = router;
 
