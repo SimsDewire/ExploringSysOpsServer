@@ -30,7 +30,7 @@ router.use(function fetchget(apicall,cb){
 module.exports={
 
 
-test: function fetchget(apicall,cb){
+calls: function fetchget(apicall,cb){
 			console.log("does it work?");
 
 	httpGetasync(apicall, function(data){

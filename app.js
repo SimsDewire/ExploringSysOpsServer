@@ -12,10 +12,9 @@ var externcalls = require("./externcalls/extern.js");
  
 
 
-externcalls.test('/courses/');
 
 var server = app.listen(3000, function () {
     console.log("Listening on port %s...", server.address().port);
 });
 
-externcalls.test("http://localhost:3001/courses");
+externcalls.calls("http://localhost:3001/courses");
