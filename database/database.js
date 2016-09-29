@@ -13,43 +13,56 @@ db.once("open", function(callback) {
 	console.log("Connection succeeded.");
 });
 
-// Load module DataHistory.js
-var DataHistoryModel = require('../models/DataHistory.js');
 
-// Create instance of DataHistory model to make testdata
-var testData = new DataHistoryModel();
-testData.type = "graph";
-testData.sender = "FK";
-testData.data = "saoid wqoie ihwqeowq hewqoie hwqewq";
-testData.time = new Date().toJSON().slice(0,10);
-
-// Save created testdata to database
-testData.save(
-	function(err) {
-		if (err) {
-			console.log("Could not store history testdata!");
-		} else {
-			console.log("Saved history testdata successfully: ");
-			console.log(testData);
-		}
-	}
-);
-
-// Load module Plugin.js
+/*
+###### Load module objects from model files for testing purposes
+*/
 var PluginModel = require('../models/Plugin.js');
+var SourceModel = require('../models/Source.js');
+var SourceValuesModel = require('../models/SourceValues.js')('Telia01');
 
-// Create instance of Plugin model
-var testDataPlugin = new PluginModel();
-testDataPlugin.pluginID = 500;
-testDataPlugin.source = "Something useful";
+var pluginTest = new PluginModel();
+var sourceTest = new SourceModel();
+var sourceValuesTest = new SourceValuesModel();
 
-testDataPlugin.save(
-	function(err) {
-		if (err) {
-			console.log("Could not store plugin testdata!");
-		} else {
-			console.log("Saved plugin testdata successfully: ");
-			console.log(testDataPlugin);
-		}
+
+/*
+###### Add testdata into each of the module objects
+*/
+pluginTest.setValues({name : "1234", 
+							description : "5678", 
+							creator : "9012", 
+							version : "4444",
+							pluginPath : "5555",
+							webURL : "6666"});
+							
+sourceTest.setValues({
+	URL : "www.google.se",
+	updatedAt : new Date().toJSON().slice(0,10),
+	pluginID : pluginTest._id
+});
+
+sourceValuesTest.setValues({
+	value : "Source valuezs",
+	createdAt : new Date().toJSON().slice(0,10)
+});
+
+
+/*
+###### Save testdata into respective table of each model object
+*/
+pluginTest.save();
+sourceTest.save();
+sourceValuesTest.save();
+
+
+module.exports = {
+	// TODO: Make some sort of API for the database here
+	A: function() {
+		console.log("A is called from database!");
+	},
+	
+	B: function() {
+		console.log("B is called from database!");
 	}
-);
+};
