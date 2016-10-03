@@ -17,19 +17,25 @@ var databaseHandler = require('./database/database.js');
 
 
 // Add a new plugin
-databaseHandler.AddPlugin({
+/*databaseHandler.AddPlugin({
 	name : "FunnyPlugin",
 	description : "A very funny plugin!",
 	creator : "Mr.Funny",
 	version : "13.37",
 	pluginPath : "www.trololz.com/plugin",
 	webURL : "www.trololz.com/docs"
+});*/
+
+var result = databaseHandler.AddPlugin({
+	naasdsadsadme : "This should go wrong!"
 });
 
+console.log(result);
+
 // Find plugin by name
-databaseHandler.FindPlugin({name : "FunnyPlugin"}).then(function(result) {
+/*databaseHandler.FindPlugin({name: "FunnyPlugin"}).then(function(result) {
 	console.log(result);
-});
+});*/
 
 
 /*

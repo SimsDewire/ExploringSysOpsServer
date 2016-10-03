@@ -23,26 +23,35 @@ var SourceValuesModel = require('../models/SourceValues.js')('Telia01');
 var ErrorHandlerModel = require('../models/ErrorHandler.js');
 
 
+function generateErrorObject(errorMessage, errorJSON) {
+	var errorObj = new ErrorHandlerModel({error: 1, message: errorMessage, data: errorJSON});
+	errorObj.save();
+	return errorObj;
+}
+
 /*
 Database API functions 
 */
 module.exports = {
 	AddPlugin : function(pluginJSON) {
-		var createdPlugin = new PluginModel(pluginJSON);
+		try {
+			var createdPlugin = new PluginModel(pluginJSON);
 		
-		createdPlugin.save(function(err) {
-			if (err) {
-				new ErrorHandlerModel({error: 1, message: "Could not add plugin!", data: pluginJSON}).save();
-			}
-		});
+			createdPlugin.save().then(function (res) {
+				console.log("Added plugin", res);
+			}).catch(function(err) {
+				return generateErrorObject("Could not add plugin!");
+			});
+		} catch(e) {
+			return generateErrorObject("Wrong JSON object was sent!");
+		}
 	},
 	
 	FindPlugin : function(searchJSON) {
-		return PluginModel.find(searchJSON, function (err, result) {
-			if (err) {
-				new ErrorHandlerModel({error: 1, message: "Could not find plugin!", data: searchJSON}).save();
-			}
+		return PluginModel.find(searchJSON).then(function (result) {
 			return result;
+		}).catch(function(err) {
+			return generateErrorObject("Could not find plugin!");
 		});
 	}
 };
