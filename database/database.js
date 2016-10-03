@@ -20,6 +20,7 @@ db.once("open", function(callback) {
 var PluginModel = require('../models/Plugin.js');
 var SourceModel = require('../models/Source.js');
 var SourceValuesModel = require('../models/SourceValues.js')('Telia01');
+var ErrorHandlerModel = require('../models/ErrorHandler.js');
 
 
 /*
@@ -31,7 +32,7 @@ module.exports = {
 		
 		createdPlugin.save(function(err) {
 			if (err) {
-				// TODO: Log error with logging tool or something else...
+				new ErrorHandlerModel({error: 1, message: "Could not add plugin!", data: pluginJSON}).save();
 			}
 		});
 	},
@@ -39,9 +40,9 @@ module.exports = {
 	FindPlugin : function(searchJSON) {
 		return PluginModel.find(searchJSON, function (err, result) {
 			if (err) {
-				return 
+				new ErrorHandlerModel({error: 1, message: "Could not find plugin!", data: searchJSON}).save();
 			}
 			return result;
 		});
-	},
+	}
 };
