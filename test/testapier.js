@@ -29,12 +29,26 @@ app.get('/test', function (req, res) {
 
 
 });
-var exp =0;
+var exp ={'Test':'3'};
+var numb=1;
 var expcheck=1;
 app.get('/test/exp', function(req,res){
-	if(expcheck==1){
-		exp++;
+
+	if(numb<=800 && expcheck==1){
+		numb=numb*3;
+		exp.Test=numb;
+		res.send(exp);
 	}
+	else if(numb>=800 && expcheck <=7){
+		expcheck++;
+		res.send(exp);
+	}
+	else if(expcheck>1){
+		numb=numb*(1/3);
+		exp.Test=numb;
+		expcheck--;
+		res.send(exp);
+		}
 
 
 
