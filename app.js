@@ -14,8 +14,23 @@ var externcalls = require("./externcalls/extern.js");*/
  
 // Load database module
 var databaseHandler = require('./database/database.js');
-databaseHandler.A();
-databaseHandler.B();
+
+
+// Add a new plugin
+databaseHandler.AddPlugin({
+	name : "FunnyPlugin",
+	description : "A very funny plugin!",
+	creator : "Mr.Funny",
+	version : "13.37",
+	pluginPath : "www.trololz.com/plugin",
+	webURL : "www.trololz.com/docs"
+});
+
+// Find plugin by name
+databaseHandler.FindPlugin({name : "FunnyPlugin"}).then(function(result) {
+	console.log(result);
+});
+
 
 /*
 var server = app.listen(3000, function () {
