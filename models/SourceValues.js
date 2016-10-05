@@ -3,7 +3,7 @@ var mongoose = require("./mongooseExtended");
 var SourceValuesSchema = new mongoose.Schema({
 	value : String,
 	createdAt : { type: Date, default: Date.now }
-});
+}, {strict: "throw"});
 
 
 module.exports = function(name) {

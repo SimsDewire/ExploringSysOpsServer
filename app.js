@@ -16,21 +16,38 @@ var externcalls = require("./externcalls/extern.js");*/
 var databaseHandler = require('./database/database.js');
 
 
-// Add a new plugin
-databaseHandler.AddPlugin({
-	name : "FunnyPlugin",
-	description : "A very funny plugin!",
-	creator : "Mr.Funny",
-	version : "13.37",
-	pluginPath : "www.trololz.com/plugin",
-	webURL : "www.trololz.com/docs"
-});
+/*
+var result = databaseHandler.AddSource({
+	naasdsadsadme : "This should go wrong!"
+});*/
+
 
 // Find plugin by name
-databaseHandler.FindPlugin({name : "FunnyPlugin"}).then(function(result) {
+/*databaseHandler.FindPlugin({name: "FunnyPlugin"}).then(function(result) {
+	//console.log(result[0]._id);
+	
+	var r = databaseHandler.AddSource({
+		URL : "www.x.x.com",
+		pluginID : result[0]._id
+	});
+	
+	console.log(r);
+});*/
+
+// Add some data into a collection called httpwwwgooglese
+console.log(databaseHandler.AddSourceValue({value : "Value A", createdAt : new Date("Tue Oct 04 2016 17:30:33 GMT+0200 (CEST)")}, "http://www.google.se".replace(/[^A-Za-z0-9]/g, '')));
+console.log(databaseHandler.AddSourceValue({value : "Value B", createdAt : new Date("Tue Oct 04 2016 17:30:39 GMT+0200 (CEST)")}, "http://www.google.se".replace(/[^A-Za-z0-9]/g, '')));
+console.log(databaseHandler.AddSourceValue({value : "Value C", createdAt : new Date("Tue Oct 04 2016 17:30:51 GMT+0200 (CEST)")}, "http://www.google.se".replace(/[^A-Za-z0-9]/g, '')));
+console.log(databaseHandler.AddSourceValue({value : "Value D", createdAt : new Date("Tue Oct 04 2016 17:31:17 GMT+0200 (CEST)")}, "http://www.google.se".replace(/[^A-Za-z0-9]/g, '')));
+console.log(databaseHandler.AddSourceValue({value : "Value E", createdAt : new Date("Tue Oct 04 2016 17:25:01 GMT+0200 (CEST)")}, "http://www.google.se".replace(/[^A-Za-z0-9]/g, '')));
+
+// Search in a certain interval, in the data history
+databaseHandler.FindSourceValue(new Date("Tue Oct 04 2016 17:24:00 GMT+0200 (CEST)"), 
+								new Date("Tue Oct 04 2016 17:37:00 GMT+0200 (CEST)"), 
+								"httpwwwgooglese").then(function(result) {
+	
 	console.log(result);
 });
-
 
 /*
 var server = app.listen(3000, function () {
