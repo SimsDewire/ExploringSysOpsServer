@@ -1,5 +1,7 @@
 var appRouter = function(app, upload) {
 
+	var databaseHandler = require('./../database/database.js');
+
 	//Test for GET
 	app.get("/", function(req, res) {
 		console.log("Send worked: Hello World is shown\n"+req.ip+"\n");
@@ -17,15 +19,40 @@ var appRouter = function(app, upload) {
 
 
 	/** INTERN SOURCES **/
+	
+	//get latest data, get list of plugins, get one plugins files(data, zip and what not).
 
-	//To be called from an intern source to update the values to the headset.
-	app.get("/intern/update-values/:sourceId/:intervall", function(req, res) {
-		// Default latest value available
-		console.log(req.params.sourceId + "\n" + req.params.intervall);
-		res.end();
-		// Otherwise values between:
-			//req.query.from
-			//req.query.to
+	/* app.get("/intern/update-value-latest/:sourceURL", function(req, res)
+	*	PARAMETERS: sourceURL, the name of the datasource where the data should be found.
+	*
+	*	FUNCTION: returns the latest value from a certain source specified by the caller.
+	*
+	*	RETURNS: BSON containing the latest value.
+	*/
+	app.get("/intern/update-value-latest/:sourceURL/:numLimit", function(req, res){
+		console.log("sourceURL: " + req.params.sourceURL + "\nnumLimit" + req.params.numLimit);
+		databaseHandler.GetSourceValueLatest(req.params.sourceURL, req.params.numLimit).then(function(result) {
+											console.log(result);
+											res.send(result);
+										});
+	});
+
+	/* app.get("/intern/update-values/:sourceURL/:from/:to", function(req, res)
+	*	PARAMETERS: sourceURL, the name of the datasource where the data should be found.
+	*							from, the start date of a given interval.
+	* 			  		to, the end date of a given interval.
+	*	FUNCTION: returns all the data from a certain interval that is specified by the caller.
+	*
+	*	RETURNS: BSON containing the result from the search. 
+	*/
+	app.get("/intern/update-values/:sourceURL/:from/:to", function(req, res) {
+		console.log(req.params.sourceURL);
+		databaseHandler.FindSourceValue(new Date(req.params.from), 
+										new Date(req.params.to), 
+										req.params.sourceURL).then(function(result) {
+											console.log(result);
+											res.send(result);
+										});
 	});
 
 
