@@ -119,7 +119,7 @@ module.exports = {
 			var createdSourceValue = new SourceValueModel(sourceValueJSON);
 		
 			createdSourceValue.save().then(function (res) {
-				console.log("Added source value", res);
+				console.log("Added source value " + res + " into collection " + collectionName);
 			}).catch(function(err) {
 				return generateErrorObject("Could not add source value!");
 			});
