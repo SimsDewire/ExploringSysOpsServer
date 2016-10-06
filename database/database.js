@@ -147,5 +147,21 @@ module.exports = {
 		}).catch(function(err) {
 			return generateErrorObject("Could not find data specified!");
 		});
+	},
+
+	/* GetSourceValueLatest(collectionName, numLimit)
+	* PARAMETERS: collectionName, the url of the source or name of table.
+	*			  numLimit, the number of objects that should be returned.
+	*
+	* RETURNS: BSON containing the data objects.
+	*/
+	GetSourceValueLatest : function(collectionName, numLimit) {
+		var SourceValueModel = require('../models/SourceValues.js')(collectionName);
+
+		return SourceValueModel.find({}).sort('-createdAt').limit(parseInt(numLimit)).then(function (result) {
+			return result;
+		}).catch(function(err) {
+			return generateErrorObject("Could not find data specified!");
+		});	
 	}
 };
