@@ -53,7 +53,7 @@ app.get('/test/exp', function(req,res){
 		console.log(req.connection.remoteAddress+" requested");
 		res.send(exp);
 		}
-//he ångra mig
+//he ån hopp
 
 
 });
