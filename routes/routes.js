@@ -1,4 +1,4 @@
-var appRouter = function(app, upload) {
+var appRouter = function(app, upload, http) {
 
 	var databaseHandler = require('./../database/database.js');
 
@@ -11,11 +11,74 @@ var appRouter = function(app, upload) {
 
 	/** EXTERN SOURCES **/
 
-	function requestExternSource(source) {
-		// body...
-	}
 	//To be called from an extern source that says: "These values are new".
-	app.get("/extern/update-values/:values", function(req, res) {requestExternSource(req.params.values)});
+
+	/* app.get("/extern/update-values/:sourceURL/:value", function(req, res)
+	*PARAMETERS: source, the name of the datasource from where the data is sent.
+	*						 value, the JSON object that contains the value which will be saved.
+	*
+	*	FUNCTION: The function of the call is that external sources can be able to send values to the database.
+	*
+	*	RETURNS: BSON containing the value that was sent.
+	*
+	*/
+	app.get("/extern/update-values/:source/:value", function(req, res) {
+		console.log("source: " + req.params.source + "\nvalue: " + req.params.value);
+		var log = databaseHandler.AddSourceValue(JSON.parse(req.params.value), req.params.source);
+		
+		console.log(log);
+		res.send(log);
+	});
+
+
+	/* app.post("/extern/update-values/", upload.array(), function(req, res, next)
+	*	PARAMETERS: The call is a POST-call and wants these parameters: 
+	*	Hostname("localhost"), port, path(path to source, after host. "/internal/source") and method("GET/POST osv.").
+	*
+	*	FUNCTION: The function of the call is so that the application can make requests external API to get data.
+	*
+	*	RETURNS: A BSON object that contains the object returned from the external source.
+	*
+	*/
+	app.post("/extern/request-values/", upload.array(), function(req, res, next) {
+		console.log("CALL: ");
+
+		//A JSON object that contains all data to access a remote API.
+		var options = {
+			hostname: req.body.sourceURL,
+			port: req.body.port,
+			path: req.body.path,
+			method: req.body.method
+		};
+		//Writes in the conolse what was required. 
+		console.log(options);
+
+		//Require data from a specified source API, the data is stored in 'chunk'.
+		var require = http.request(options, (result) => {
+			console.log('STATUS:', result.statusCode);
+			console.log('HEADERS:', JSON.stringify(result.headers));
+			
+			result.setEncoding('utf8');
+			
+			result.on('data', (chunk) => {
+				console.log('BODY:', chunk);
+				res.send(chunk);
+			});
+
+			result.on('end', () => {
+				console.log('No more data in response.');
+				res.end();
+			});
+		});
+
+		//Message on error.
+		require.on('error', (e) => {
+			console.log('problem with request:', e.message);
+			res.end("error: " + e.message)
+		});
+		require.end();
+	});
+	
 
 
 	/** INTERN SOURCES **/
@@ -36,6 +99,7 @@ var appRouter = function(app, upload) {
 											res.send(result);
 										});
 	});
+
 
 	/* app.get("/intern/update-values/:sourceURL/:from/:to", function(req, res)
 	*	PARAMETERS: sourceURL, the name of the datasource where the data should be found.

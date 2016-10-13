@@ -1,14 +1,15 @@
 var express = require("express");
 var bodyParser = require("body-parser");
 var multer = require("multer"); // v1.0.5
+var http = require("http");
 var upload = multer(); // for parsing multipart/form-data
 var app = express();
 
-/*
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-var externcalls = require("./externcalls/extern.js");*/
-var routes = require("./routes/routes.js")(app, upload);
+/*var externcalls = require("./externcalls/extern.js");*/
+var routes = require("./routes/routes")(app, upload, http);
 //app.use(externcalls);
  
  
