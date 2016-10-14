@@ -1,19 +1,25 @@
 {
-  "name": "",
+  "name": "ExploringSysOpsServer",
   "version": "1.0.1",
-  "description": "",
+  "description": "A server for the Sims dewire group",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "concurrently --kill-others \"npm run mongodb\" \"npm run server\"",
+    "mongodb": "echo 'Please make sure MongoDB is installed' && mongod --dbpath data/db/",
+    "server": "echo 'Starting app.js.'' && node app.js"
   },
-  "author": "",
+  "author": "Sims dewire",
   "license": "ISC",
+  "repository": "https://github.com/SimsDewire/ExploringSysOpsServer",
   "dependencies": {
     "mongoose": "*",
     "mongodb": "*",
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
     "multer": "^1.2.0",
-    "http":"*"
+    "http": "*"
+  },
+  "devDependencies": {
+    "concurrently": "^3.1.0"
   }
 }
