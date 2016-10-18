@@ -6,7 +6,7 @@
   "scripts": {
     "start": "concurrently --kill-others \"npm run mongodb\" \"npm run server\"",
     "mongodb": "echo 'Please make sure MongoDB is installed' && mongod --dbpath data/db/",
-    "server": "echo 'Starting app.js.'' && node app.js"
+    "server": "echo 'Starting app.js.' && node app.js"
   },
   "author": "Sims dewire",
   "license": "ISC",
