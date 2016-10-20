@@ -1,8 +1,8 @@
 # ExploringSysOpsServer  
 
-This repository is a part of a school-project called Student Inovation Mid Sweden, or SIMS for short. What we, as the Dewire group,
+This repository is a part of a school-project called Student Innovation Mid Sweden, or SIMS for short. What we, as the Dewire group,
 will do for this project is to Explore the world of System Operators (Exploring SysOps) where the focus will be on how to improve
-system surveilance.  
+system surveillance.  
 
 **ExploringSysOpsServer**  
 This is the server-side of the project.  
