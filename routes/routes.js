@@ -25,9 +25,12 @@ var appRouter = function(app, upload, http) {
 	app.get("/extern/update-values/:source/:value", function(req, res) {
 		console.log("source: " + req.params.source + "\nvalue: " + req.params.value);
 		var log = databaseHandler.AddSourceValue(JSON.parse(req.params.value), req.params.source);
-		
-		console.log(log);
-		res.send(log);
+
+		var response = {};
+		response["log"] = log;
+
+		console.log(response);
+		res.send(response);
 	});
 
 
@@ -95,8 +98,11 @@ var appRouter = function(app, upload, http) {
 	app.get("/intern/update-value-latest/:sourceURL/:numLimit", function(req, res){
 		console.log("sourceURL: " + req.params.sourceURL + "\nnumLimit" + req.params.numLimit);
 		databaseHandler.GetSourceValueLatest(req.params.sourceURL, req.params.numLimit).then(function(result) {
-											console.log(result);
-											res.send(result);
+											var response = {};
+											response["result"] = result;
+
+											console.log(response);
+											res.send(response);
 										});
 	});
 
@@ -114,43 +120,13 @@ var appRouter = function(app, upload, http) {
 		databaseHandler.FindSourceValue(new Date(req.params.from), 
 										new Date(req.params.to), 
 										req.params.sourceURL).then(function(result) {
-											console.log(result);
-											res.send(result);
+											var response = {};
+											response["result"] = result;
+
+											console.log(response);
+											res.send(response);
 										});
 	});
-
-
-	/** MARKETPLACE **/
-
-	// Responds with a list of the 50 first plugins
-	app.get("/marketplace/plugin/list/", function(req, res) {});
-	// Responds with a list of the n first plugins
-	app.get("/marketplace/plugin/list/:n", function(req, res) {});
-
-	// Responds with a list of plugins matching the query
-	app.get("/marketplace/plugin/search/:query", function(req, res) {});
-
-	// Responds with the plugin data
-	app.get("/marketplace/plugin/install/:pluginId", function(req, res) {});
-
-
-	// Uploads a plugin to the server (low priority)
-	app.post("/marketplace/plugin/", authenticate, function(req, res) {});
-
-	// Removes a plugin from the server (low priority)
-	app.delete("/marketplace/plugin/:pluginId", authenticate, function(req, res) {});
-
-	// Login a registered user
-	app.put("/user/login", function(req, res) {});
-
-
-	function authenticate(req, res, next) {
-		if(authenticated) {
-			next();
-		}
-		res.end('{error: "Failed to authenticate"}');
-	}
-
 
 	/** TESTING **/
 
