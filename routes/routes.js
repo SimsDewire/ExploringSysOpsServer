@@ -4,7 +4,7 @@ var appRouter = function(app, upload, http) {
 
 	//Test for GET
 	app.get("/", function(req, res) {
-		console.log("Send worked: Hello World is shown\n"+req.ip+"\n");
+		console.log("Hello World\n"+req.ip+"\n");
 		res.send("Hello World");
 	});
 
@@ -24,13 +24,14 @@ var appRouter = function(app, upload, http) {
 	*/
 	app.get("/extern/update-values/:source/:value", function(req, res) {
 		console.log("source: " + req.params.source + "\nvalue: " + req.params.value);
-		var log = databaseHandler.AddSourceValue(JSON.parse(req.params.value), req.params.source);
 
+		var log = databaseHandler.AddSourceValue(JSON.parse(req.params.value), req.params.source);
 		var response = {};
+		
 		response["log"] = log;
 
 		console.log(response);
-		res.send(response);
+		res.status(200).send(response);
 	});
 
 
@@ -65,19 +66,19 @@ var appRouter = function(app, upload, http) {
 			
 			result.on('data', (chunk) => {
 				console.log('BODY:', chunk);
-				res.send(chunk);
+				res.status(200).send(chunk);
 			});
 
 			result.on('end', () => {
 				console.log('No more data in response.');
-				res.end();
+				res.status(200).end();
 			});
 		});
 
 		//Message on error.
 		require.on('error', (e) => {
 			console.log('problem with request:', e.message);
-			res.end("error: " + e.message)
+			res.status(400).end("error: " + e.message)
 		});
 		require.end();
 	});
@@ -97,12 +98,13 @@ var appRouter = function(app, upload, http) {
 	*/
 	app.get("/intern/update-value-latest/:sourceURL/:numLimit", function(req, res){
 		console.log("sourceURL: " + req.params.sourceURL + "\nnumLimit" + req.params.numLimit);
+
 		databaseHandler.GetSourceValueLatest(req.params.sourceURL, req.params.numLimit).then(function(result) {
 											var response = {};
 											response["result"] = result;
 
 											console.log(response);
-											res.send(response);
+											res.status(200).send(response);
 										});
 	});
 
@@ -124,7 +126,7 @@ var appRouter = function(app, upload, http) {
 											response["result"] = result;
 
 											console.log(response);
-											res.send(response);
+											res.status(200).send(response);
 										});
 	});
 
