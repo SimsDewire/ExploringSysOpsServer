@@ -7,7 +7,7 @@ var PluginSchema = new mongoose.Schema({
 	version : String,
 	pluginPath : String,
 	webURL : String
-}, {strict: "throw"});
+}, {strict: "throw", versionKey: false});
 
 // Force name of the collection to avoid standard naming
 PluginSchema.set('collection', 'Plugin');

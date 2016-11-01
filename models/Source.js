@@ -4,7 +4,7 @@ var SourceSchema = new mongoose.Schema({
 	URL : String,
 	updatedAt : { type: Date, default: Date.now },
 	pluginID : mongoose.Schema.Types.ObjectId
-}, {strict: "throw"});
+}, {strict: "throw", versionKey: false});
 
 // Force name of the collection to avoid standard naming
 SourceSchema.set('collection', 'Source');
