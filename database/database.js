@@ -10,7 +10,7 @@ var db = mongoose.connection;
 
 db.on("error", console.error.bind(console, "connection error"));
 db.once("open", function(callback) {
-	console.log("Connection succeeded.");
+	//console.log("Connection succeeded.");
 });
 
 
@@ -119,7 +119,7 @@ module.exports = {
 			var createdSourceValue = new SourceValueModel(sourceValueJSON);
 		
 			createdSourceValue.save().then(function (res) {
-				console.log("Added source value " + res + " into collection " + collectionName);
+				//console.log("Added source value " + res + " into collection " + collectionName);
 			}).catch(function(err) {
 				return generateErrorObject("Could not add source value!");
 			});

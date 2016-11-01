@@ -1,13 +1,12 @@
-var appRouter = function(app, upload, http) {
+var appRouter = function(app, upload, http, logger) {
 
 	var databaseHandler = require('./../database/database.js');
 
-	//Test for GET
+	// Test for GET
 	app.get("/", function(req, res) {
-		console.log("Hello World\n"+req.ip+"\n");
+		logger.log("Hello World\n"+req.ip+"\n");
 		res.send("Hello World");
 	});
-
 
 	/** EXTERN SOURCES **/
 
@@ -23,14 +22,14 @@ var appRouter = function(app, upload, http) {
 	*
 	*/
 	app.get("/extern/update-values/:source/:value", function(req, res) {
-		console.log("source: " + req.params.source + "\nvalue: " + req.params.value);
+		logger.log("source: " + req.params.source + "\nvalue: " + req.params.value);
 
 		var log = databaseHandler.AddSourceValue(JSON.parse(req.params.value), req.params.source);
 		var response = {};
 		
 		response["log"] = log;
 
-		console.log(response);
+		logger.log(response);
 		res.status(200).send(response);
 	});
 
@@ -45,7 +44,7 @@ var appRouter = function(app, upload, http) {
 	*
 	*/
 	app.post("/extern/request-values/", upload.array(), function(req, res, next) {
-		console.log("CALL: ");
+		logger.log("CALL: ");
 
 		//A JSON object that contains all data to access a remote API.
 		var options = {
@@ -55,29 +54,29 @@ var appRouter = function(app, upload, http) {
 			method: req.body.method
 		};
 		//Writes in the conolse what was required. 
-		console.log(options);
+		logger.log(options);
 
 		//Require data from a specified source API, the data is stored in 'chunk'.
 		var require = http.request(options, (result) => {
-			console.log('STATUS:', result.statusCode);
-			console.log('HEADERS:', JSON.stringify(result.headers));
+			logger.log('STATUS:', result.statusCode);
+			logger.log('HEADERS:', JSON.stringify(result.headers));
 			
 			result.setEncoding('utf8');
 			
 			result.on('data', (chunk) => {
-				console.log('BODY:', chunk);
+				logger.log('BODY:', chunk);
 				res.status(200).send(chunk);
 			});
 
 			result.on('end', () => {
-				console.log('No more data in response.');
+				logger.log('No more data in response.');
 				res.status(200).end();
 			});
 		});
 
 		//Message on error.
 		require.on('error', (e) => {
-			console.log('problem with request:', e.message);
+			logger.log('problem with request:', e.message);
 			res.status(400).end("error: " + e.message)
 		});
 		require.end();
@@ -97,13 +96,13 @@ var appRouter = function(app, upload, http) {
 	*	RETURNS: BSON containing the latest value.
 	*/
 	app.get("/intern/update-value-latest/:sourceURL/:numLimit", function(req, res){
-		console.log("sourceURL: " + req.params.sourceURL + "\nnumLimit" + req.params.numLimit);
+		logger.log("sourceURL: " + req.params.sourceURL + "\nnumLimit" + req.params.numLimit);
 
 		databaseHandler.GetSourceValueLatest(req.params.sourceURL, req.params.numLimit).then(function(result) {
 											var response = {};
 											response["result"] = result;
 
-											console.log(response);
+											logger.log(response);
 											res.status(200).send(response);
 										});
 	});
@@ -118,14 +117,14 @@ var appRouter = function(app, upload, http) {
 	*	RETURNS: BSON containing the result from the search. 
 	*/
 	app.get("/intern/update-values/:sourceURL/:from/:to", function(req, res) {
-		console.log(req.params.sourceURL);
+		logger.log(req.params.sourceURL);
 		databaseHandler.FindSourceValue(new Date(req.params.from), 
 										new Date(req.params.to), 
 										req.params.sourceURL).then(function(result) {
 											var response = {};
 											response["result"] = result;
 
-											console.log(response);
+											logger.log(response);
 											res.status(200).send(response);
 										});
 	});
@@ -139,16 +138,21 @@ var appRouter = function(app, upload, http) {
 
 	//Test for GET with parameter
 	app.get("/get/:id", function(req, res) {
-		console.log(req.body+"\n"+req.ip+"\n");
+		logger.log(req.body+"\n"+req.ip+"\n");
 		res.send("your id is: " + req.params.id);
 	});
 
 	//Test for POST
 	app.post('/posting/', upload.array(), function (req, res, next) {
-		console.log(req.body);
-		console.log(req.ip);
+		logger.log(req.body);
+		logger.log(req.ip);
 		
 		res.json(req.body);
+	});
+
+
+	app.post('/addition', function(req, res, next) {
+ 		res.json({"error" : false, "message" : "success", "data" : parseInt(req.body.num1) + parseInt(req.body.num2)});
 	});
 
 }

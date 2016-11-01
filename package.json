@@ -6,7 +6,8 @@
   "scripts": {
     "start": "concurrently --kill-others \"npm run mongodb\" \"npm run server\"",
     "mongodb": "echo 'Please make sure MongoDB is installed' && mongod --dbpath data/db/",
-    "server": "echo 'Starting app.js.' && node app.js"
+    "server": "echo 'Starting app.js.' && node app.js",
+    "test": "mocha test/index.js"
   },
   "author": "Sims dewire",
   "license": "ISC",
@@ -20,6 +21,8 @@
     "http": "*"
   },
   "devDependencies": {
-    "concurrently": "^3.1.0"
+    "concurrently": "^3.1.0",
+    "should": "^11.1.1",
+    "supertest": "^2.0.1"
   }
 }
