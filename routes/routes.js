@@ -152,7 +152,11 @@ var appRouter = function(app, upload, http, logger) {
 
 
 	app.post('/addition', function(req, res, next) {
- 		res.json({"error" : false, "message" : "success", "data" : parseInt(req.body.num1) + parseInt(req.body.num2)});
+		var response = {};
+		
+		response["result"] = {"result" : parseInt(req.body.num1) + parseInt(req.body.num2)};
+
+		res.status(200).send(response);
 	});
 
 }
