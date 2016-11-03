@@ -27,7 +27,7 @@ var appRouter = function(app, upload, http, logger) {
 		var log = databaseHandler.AddSourceValue(JSON.parse(req.params.value), req.params.source);
 		var response = {};
 		
-		response["log"] = log;
+		response["result"] = log;
 
 		logger.log(response);
 		res.status(200).send(response);

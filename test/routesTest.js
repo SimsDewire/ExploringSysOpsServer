@@ -5,18 +5,21 @@ module.exports = function(request) {
 		describe("Testing route (POST): " + data.route, function() {
 
 			for (var i in data.tests) {
-				var test = data.tests[i];
-			    it("Using params: " + JSON.stringify(test.params) + ", expecting: " + test.expectedValue, function(done) {
+				var testCase = data.tests[i];
+
+			    it("Using params: " + JSON.stringify(testCase.params), function(done) {
 			        request
 			        	.post(data.route)
 			        	.type('form')
-			        	.send(test.params)
+			        	.send(testCase.params)
 			        	.expect('Content-Type', /json/)
-			            .expect(200)
 			            .end(function(err, res) {
 			            	res.status.should.equal(200);
-			            	res.body.error.should.equal(false);
-			            	res.body.data.should.equal(test.expectedValue);
+			            	res.error.should.equal(false);
+
+			            	for (var val in testCase.expectedResponse)
+			            		res.body.data.should.equal(testCase[val].expectedValue);
+
 			            	done();
 			        });
 			    });
@@ -27,51 +30,62 @@ module.exports = function(request) {
 	}
 
 	function testGET(data) {
-		// Add parameters in such a way that they are added after / in the route
-		var paramsStr = "";
-		for (var i in data.params)
-			paramsStr += ("/" + ((typeof data.params[i] == 'object') ? JSON.stringify(data.params[i]) : data.params[i]));
-
-		var expectedResponse = (typeof data.expectedResponse == 'object') ? JSON.stringify(data.expectedResponse) : data.expectedResponse;
-
 		describe("Testing route (GET): " + data.route, function() {
-			it("Using: " + paramsStr + " - Expecting: " + expectedResponse, function(done) {
-				request
-			        .get(data.route + paramsStr)
-			        .expect('Content-Type', /json/)
-			        .expect(200)
-			        .end(function(err, res) {
-			        	res.status.should.equal(200);
-			            res.error.should.equal(false);
-			            //res.log.value.should.equal(expectedResponse.value);
-			            done();
-			        });
-			});
+
+			for (var currentTest in data.tests) {
+				var testCase = data.tests[currentTest];
+
+				// Add parameters in such a way that they are added after / in the route
+				var paramsStr = "";
+				for (var i in testCase.params) paramsStr += ("/" + ((typeof testCase.params[i] == 'object') ? JSON.stringify(testCase.params[i]) : testCase.params[i]));
+
+				it("- Using: " + paramsStr, function(done) {
+					request
+				        .get(data.route + paramsStr)
+				        .end(function(err, res) {
+				        	res.status.should.equal(200);
+				            res.error.should.equal(false);
+				            res.body.result.should.be.json;
+
+				            // Loop trough each property of expectedResponse and check that they are correct
+				            for (var val in testCase.expectedResponse)
+				            	res.body.result[val].should.equal(testCase.expectedResponse[val]);
+
+				            done();
+				        });
+				});
+			}
+
 		});
 	}
 
-/*
-	for (var i=0; i<20; i++) {
-		testPOST({route : "/addition",
-				  tests: [ {params : {num1 : i, num2 : i},
-				  expectedValue : i+i},
-				  {params : {num1 : i+5, num2 : i+5},
-				  expectedValue : i+10+i}]});
-	}*/
 
-	/*
-		tests : [ {params: {source : "wwwtestse", value : "Evil test value"}, expectedValue : "Evil test value"},
-				  {params: {source : "wwwtestse", value : ""}, expectedValue : ""},
-				  {params: {source : "wwwtestse", value : "0000000s00000000"}, expectedValue : "0000000s0000000"}
-	*/
-
-	var strTestJSON = {
+	testGET({
 		route : "/extern/update-values",
-		params : {source : "wwwtestse", data : {value:"FunnyValuez"}},
-		expectedResponse : {value:"FunnyValuez"}
-	};
+		tests: [{
+				params : {source : "wwwtestse", data : {value:"FunnyValuez"}},
+				expectedResponse : {value:"FunnyValuez"}
+				},
 
-	testGET(strTestJSON);
+				{
+				params : {source : "wwwtestse", data : {value:"A"}},
+				expectedResponse : {value:"A"}
+				}
+			]
+	});
 
 
+	testPOST({
+		route : "/addition",
+		tests: [{
+			 	params : {num1 : 15, num2 : 25},
+			  	expectedValue : {result : 15+25}
+			  	},
+			  
+			  	{
+			  	params : {num1 : 77, num2 : 11},
+				expectedValue : {result : 77+11}
+				}
+			]
+	});
 }
