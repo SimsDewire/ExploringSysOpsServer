@@ -22,14 +22,14 @@ var appRouter = function(app, upload, http, logger) {
 	*
 	*/
 	app.get("/extern/update-values/:source/:value", function(req, res) {
-		logger.log("source: " + req.params.source + "\nvalue: " + req.params.value);
+		logger.log('debug', "source: " + req.params.source + "\nvalue: " + req.params.value);
 
-		var log = databaseHandler.AddSourceValue(JSON.parse(req.params.value), req.params.source);
+		var result = databaseHandler.AddSourceValue(JSON.parse(req.params.value), req.params.source);
 		var response = {};
 		
-		response["result"] = log;
+		response["result"] = result;
 
-		logger.log(response);
+		logger.log('debug', response);
 		res.status(200).send(response);
 	});
 
@@ -44,7 +44,7 @@ var appRouter = function(app, upload, http, logger) {
 	*
 	*/
 	app.post("/extern/request-values/", upload.array(), function(req, res, next) {
-		logger.log("CALL: ");
+		logger.log('debug', "CALL: ");
 
 		//A JSON object that contains all data to access a remote API.
 		var options = {
@@ -54,29 +54,51 @@ var appRouter = function(app, upload, http, logger) {
 			method: req.body.method
 		};
 		//Writes in the conolse what was required. 
-		logger.log(options);
+		logger.log('debug', options);
 
 		//Require data from a specified source API, the data is stored in 'chunk'.
 		var require = http.request(options, (result) => {
-			logger.log('STATUS:', result.statusCode);
-			logger.log('HEADERS:', JSON.stringify(result.headers));
+			logger.log('debug', 'STATUS: '+ result.statusCode);
+			logger.log('debug', 'HEADERS: '+ JSON.stringify(result.headers));
 			
-			result.setEncoding('utf8');
-			
+			result.setEncoding('utf8')
+
+			var collectionName = (req.body.sourceURL + req.body.port + req.body.path);
+
+			//Format the collectionname so it will not contain any special characters and then log into 'debug'.
+			collectionName = collectionName.replace(/[^A-Za-z0-9]/g, '');
+			logger.log('debug', 'COLLECTION NAME1: ' +  collectionName);
+
+			//When data is recieved.
 			result.on('data', (chunk) => {
-				logger.log('BODY:', chunk);
+
+				//Format the data-chunk so that the database understands the value.
+				chunk = JSON.parse(chunk);
+				var value = JSON.parse("{\"value\": \"" + chunk.result[0].value + "\"}");
+				
+				//Logg the data-chunk and the collection-name.
+				logger.log('debug', 'BODY: '+ chunk);
+				logger.log('debug', 'COLLECTION NAME2: ' +  collectionName);
+
+				//Store the value of the chunk into the database and log the response to 'debug'.
+				var dbResponse = databaseHandler.AddSourceValue(value, collectionName.replace(/[^A-Za-z0-9]/g, ''));
+				logger.log('debug', "Database response: " + dbResponse);
+				
+				//Return the data-chunk to from where it was sent.
 				res.status(200).send(chunk);
 			});
 
+			//When no more data is recieved.
 			result.on('end', () => {
-				logger.log('No more data in response.');
+				logger.log('debug', 'No more data in response.');
 				res.status(200).end();
 			});
 		});
 
+
 		//Message on error.
 		require.on('error', (e) => {
-			logger.log('problem with request:', e.message);
+			logger.log('error', 'problem with request: ' + e.message);
 			res.status(400).end("error: " + e.message)
 		});
 		require.end();
@@ -96,13 +118,13 @@ var appRouter = function(app, upload, http, logger) {
 	*	RETURNS: BSON containing the latest value.
 	*/
 	app.get("/intern/update-value-latest/:sourceURL/:numLimit", function(req, res){
-		logger.log("sourceURL: " + req.params.sourceURL + "\nnumLimit" + req.params.numLimit);
+		logger.log('debug', "sourceURL: " + req.params.sourceURL + "\nnumLimit" + req.params.numLimit);
 
 		databaseHandler.GetSourceValueLatest(req.params.sourceURL, req.params.numLimit).then(function(result) {
 											var response = {};
 											response["result"] = result;
 
-											logger.log(response);
+											logger.log('debug', JSON.stringify(response));
 											res.status(200).send(response);
 										});
 	});
@@ -117,14 +139,14 @@ var appRouter = function(app, upload, http, logger) {
 	*	RETURNS: BSON containing the result from the search. 
 	*/
 	app.get("/intern/update-values/:sourceURL/:from/:to", function(req, res) {
-		logger.log(req.params.sourceURL);
+		logger.log('debug', req.params.sourceURL);
 		databaseHandler.FindSourceValue(new Date(req.params.from), 
 										new Date(req.params.to), 
 										req.params.sourceURL).then(function(result) {
 											var response = {};
 											response["result"] = result;
 
-											logger.log(response);
+											logger.log('debug', response);
 											res.status(200).send(response);
 										});
 	});
@@ -133,8 +155,6 @@ var appRouter = function(app, upload, http, logger) {
 
 	//For testing the system
 	app.get("/test", function(req, res) {});
-
-
 
 	//Test for GET with parameter
 	app.get("/get/:id", function(req, res) {

@@ -14,13 +14,27 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 var logger = new (winston.Logger)({
-    transports: [
-        new (winston.transports.File)({filename: 'node.log'})
-    ]
+	transports: [
+		new winston.transports.File({
+			name: 'debug-log',
+			filename: 'logs/debug.log',
+			level: 'debug'
+		}),
+		new winston.transports.File({
+			name: 'info-log',
+			filename: 'logs/info.log',
+			level: 'info'
+		}),
+		new winston.transports.File({
+			name: 'error-log',
+			filename: 'logs/error.log',
+			level: 'error'
+		})
+	]
 });
 
 if (process.env.NODE_ENV === 'test') {
-    logger.add(winston.transports.Console, {prettyPrint: true});
+	logger.add(winston.transports.Console, {prettyPrint: true});
 }
 
 var routes = require("./routes/routes")(app, upload, http, logger);
@@ -69,7 +83,7 @@ databaseHandler.FindSourceValue(new Date("Tue Oct 04 2016 17:24:00 GMT+0200 (CES
 });*/
 
 var server = app.listen(3000, function () {
-    logger.log("Listening on port %s...", server.address().port);
+	logger.log('info', 'Listening on port %s...' + server.address().port);
 });
 
 

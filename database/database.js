@@ -82,7 +82,8 @@ module.exports = {
 	AddSource : function(sourceJSON) {
 		try {
 			var createdSource = new SourceModel(sourceJSON);
-		
+			console.log(JSON.stringify(sourceJSON));
+
 			createdSource.save().then(function (res) {
 				console.log("Added source", res);
 			}).catch(function(err) {
@@ -115,11 +116,12 @@ module.exports = {
 	AddSourceValue : function(sourceValueJSON, collectionName) {
 		var SourceValueModel = require('../models/SourceValues.js')(collectionName);
 		
+			console.log("Trying to add source value: " + sourceValueJSON + " into collection: " + collectionName);
 		try {
 			var createdSourceValue = new SourceValueModel(sourceValueJSON);
 		
 			createdSourceValue.save().then(function (res) {
-				//console.log("Added source value " + res + " into collection " + collectionName);
+				console.log("Successfully added source value " + res + " into collection " + collectionName);
 			}).catch(function(err) {
 				return generateErrorObject("Could not add source value!");
 			});
