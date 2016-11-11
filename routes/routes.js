@@ -21,16 +21,26 @@ var appRouter = function(app, upload, http, logger) {
 	*	RETURNS: BSON containing the value that was sent.
 	*
 	*/
-	app.get("/extern/update-values/:source/:value", function(req, res) {
+	app.get("/extern/update-values/", function(req, res) {
 		logger.log('debug', "source: " + req.params.source + "\nvalue: " + req.params.value);
+		try {
+			var source = req.query.source; 
+			source = source.replace(/[^A-Za-z0-9]/g, '');
+			var value = req.query.value;
+			
+			var result = databaseHandler.AddSourceValue(JSON.parse(value), source);
+			var response = {};
+			
+			response["result"] = result;
 
-		var result = databaseHandler.AddSourceValue(JSON.parse(req.params.value), req.params.source);
-		var response = {};
-		
-		response["result"] = result;
-
-		logger.log('debug', response);
-		res.status(200).send(response);
+			logger.log('debug', response);
+			res.status(200).send(response);
+		}
+		catch(e) {
+			var response = {};
+			response["result"] = {error: 1, message: "Could not handle the request params"};
+			res.status(400).send(response);
+		}
 	});
 
 
@@ -122,6 +132,7 @@ var appRouter = function(app, upload, http, logger) {
 
 		databaseHandler.GetSourceValueLatest(req.params.sourceURL, req.params.numLimit).then(function(result) {
 											var response = {};
+
 											response["result"] = result;
 
 											logger.log('debug', JSON.stringify(response));
@@ -138,17 +149,25 @@ var appRouter = function(app, upload, http, logger) {
 	*
 	*	RETURNS: BSON containing the result from the search. 
 	*/
-	app.get("/intern/update-values/:sourceURL/:from/:to", function(req, res) {
+	app.get("/intern/update-values/", function(req, res) {
 		logger.log('debug', req.params.sourceURL);
-		databaseHandler.FindSourceValue(new Date(req.params.from), 
-										new Date(req.params.to), 
-										req.params.sourceURL).then(function(result) {
-											var response = {};
-											response["result"] = result;
 
-											logger.log('debug', response);
-											res.status(200).send(response);
-										});
+		try {
+			databaseHandler.FindSourceValue(new Date(req.query.from), 
+											new Date(req.query.to), 
+											req.query.sourceURL).then(function(result) {
+												var response = {};
+
+												response["result"] = result;
+
+												logger.log('debug', response);
+												res.status(200).send(response);
+											});
+		} catch(e) {
+			var response = {};
+			response["result"] = {error: 1, message : "Something went wrong!"};
+			res.status(400).send(response);
+		}
 	});
 
 	/** TESTING **/

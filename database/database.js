@@ -144,7 +144,7 @@ module.exports = {
 	FindSourceValue : function(startDate, endDate, collectionName) {
 		var SourceValueModel = require('../models/SourceValues.js')(collectionName);
 		
-		return SourceValueModel.find({createdAt : {'$gte' : startDate, '$lt' : endDate}}).then(function (result) {
+		return SourceValueModel.find({createdAt : {'$gte' : startDate, '$lte' : endDate}}).then(function (result) {
 			return result;
 		}).catch(function(err) {
 			return generateErrorObject("Could not find data specified!");
