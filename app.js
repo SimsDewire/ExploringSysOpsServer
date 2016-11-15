@@ -37,6 +37,7 @@ if (process.env.NODE_ENV === 'test') {
 	logger.add(winston.transports.Console, {prettyPrint: true});
 }
 
+
 var routes = require("./routes/routes")(app, upload, http, logger);
 
 
