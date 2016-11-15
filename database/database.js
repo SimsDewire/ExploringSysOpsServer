@@ -82,8 +82,6 @@ module.exports = {
 	AddSource : function(sourceJSON) {
 		try {
 			var createdSource = new SourceModel(sourceJSON);
-			//console.log(JSON.stringify(sourceJSON));
-
 			createdSource.save().then(function (res) {
 				//console.log("Added source", res);
 			}).catch(function(err) {

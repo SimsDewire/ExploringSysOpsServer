@@ -12,7 +12,7 @@ var appRouter = function(app, upload, http, logger) {
 
 	//To be called from an extern source that says: "These values are new".
 
-	/* app.get("/extern/update-values/:sourceURL/:value", function(req, res)
+	/* app.post("/extern/update-values/:sourceURL/:value", function(req, res)
 	*PARAMETERS: source, the name of the datasource from where the data is sent.
 	*						 value, the JSON object that contains the value which will be saved.
 	*
@@ -21,14 +21,17 @@ var appRouter = function(app, upload, http, logger) {
 	*	RETURNS: BSON containing the value that was sent.
 	*
 	*/
-	app.get("/extern/update-values/", function(req, res) {
-		logger.log('debug', "source: " + req.params.source + "\nvalue: " + req.params.value);
+	app.post("/extern/update-values/", upload.array(), function(req, res) {
+		logger.log('debug', "source: " + req.body.source + "value: " + req.body.value);
 		try {
-			var source = req.query.source; 
-			source = source.replace(/[^A-Za-z0-9]/g, '');
-			var value = req.query.value;
+
+			var sourceFormated = req.body.source; 
+			sourceFormated = sourceFormated.replace(/[^A-Za-z0-9]/g, '');
+			console.log("source: " + req.body.source + "sourceFormated: " + sourceFormated);
 			
-			var result = databaseHandler.AddSourceValue(JSON.parse(value), source);
+			var value = {value: req.body.value};
+
+			var result = databaseHandler.AddSourceValue(value, sourceFormated);
 			var response = {};
 			
 			response["result"] = result;
@@ -169,6 +172,27 @@ var appRouter = function(app, upload, http, logger) {
 			res.status(400).send(response);
 		}
 	});
+
+	app.post("/intern/add-source", upload.array(), function(req, res) {
+		logger.log('debug', "source url: " + req.body.sourceURL);
+		try{
+			var sourceURL = {URL: req.body.source};
+			
+			var result = databaseHandler.AddSource(sourceURL);
+			var response = {};
+
+			response["result"] = result;
+
+			logger.log('debug', response);
+			res.status(200).send(response);		
+		} catch(e) {
+			var response = {};
+			response["result"] = {error: 1, message : "Something went wrong!"};
+			res.status(400).send(response);
+		}
+	});
+
+
 
 	/** TESTING **/
 

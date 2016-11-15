@@ -1,7 +1,7 @@
 var mongoose = require("./mongooseExtended");
 
 var SourceSchema = new mongoose.Schema({
-	URL : String,
+	URL : {type: String, unique: true, dropDups: true},
 	updatedAt : { type: Date, default: Date.now },
 	pluginID : mongoose.Schema.Types.ObjectId
 }, {strict: "throw", versionKey: false});
