@@ -2,19 +2,13 @@ var appRouter = function(app, upload, http, logger) {
 
 	var databaseHandler = require('./../database/database.js');
 
-	// Test for GET
-	app.get("/", function(req, res) {
-		logger.log("Hello World\n"+req.ip+"\n");
-		res.send("Hello World");
-	});
-
 	/** EXTERN SOURCES **/
 
 	//To be called from an extern source that says: "These values are new".
 
-	/* app.post("/extern/update-values/:sourceURL/:value", function(req, res)
-	*PARAMETERS: source, the name of the datasource from where the data is sent.
-	*						 value, the JSON object that contains the value which will be saved.
+	/* app.post("/extern/update-values/:sourceURL/:value", upload.array(), function(req, res)
+	* PARAMETERS: source, the name of the datasource from where the data is sent.
+	*						  value, the JSON object that contains the value which will be saved.
 	*
 	*	FUNCTION: The function of the call is that external sources can be able to send values to the database.
 	*
@@ -173,6 +167,15 @@ var appRouter = function(app, upload, http, logger) {
 		}
 	});
 
+
+
+	/* app.post("/intern/add-source", upload.array(), function(req, res){})
+	*	PARAMETERS: URL, the full url to the datasource.
+	*
+	*	FUNCTION: To add a source to the "Source"-collection with url to the source.
+	*
+	*	RETURNS: BSON containing the object that was added and a HTTP status-code. 
+	*/
 	app.post("/intern/add-source", upload.array(), function(req, res) {
 		logger.log('debug', "source url: " + req.body.sourceURL);
 		try{
