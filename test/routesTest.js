@@ -3,7 +3,7 @@ process.env.NODE_ENV = 'test';
 module.exports = function(request) {
 	var responseData = [];
 
-	/* testGET(data)
+	/* testRequest(data)
 	PARAMS: expected a JSON object as parameter, with the following attributes:
 			route - The route to test, for example: route : "/extern/add"
 			tests - An array containing different tests, this array contains JSON objects with the attributes: 'param' and 'expectedResponse'
@@ -29,8 +29,9 @@ module.exports = function(request) {
 			]
 		}
 	*/
-	function testGET(data) {
+	function testRequest(data) {
 		var tempData = [];
+		var type =( data.type || "GET").toLowerCase();
 
 		data.tests.forEach(function(testCase) {
 
@@ -49,8 +50,9 @@ module.exports = function(request) {
 					} 
 				}
 
-				request
-			        .get(data.route + paramsStr)
+				request[type](data.route + paramsStr)
+		        	//.type('form')
+		        	.send(testCase.body)
 			        .end(function(err, res) {
 			        	res.status.should.equal(testCase.expectedStatusCode || 200);
 
@@ -64,9 +66,6 @@ module.exports = function(request) {
 			            	if (typeof testCase.expectedResponse[val] == "undefined")
 			            		res.body.result.should.not.have.property(val);
 			            	else
-			            	// if (!res.body.result.hasOwnProperty(val))
-			            	// 	res.body.result.should.have.property(val);
-			            	// else
 			            		res.body.result[val].should.eql(testCase.expectedResponse[val]);
 			            }
 
@@ -121,57 +120,58 @@ module.exports = function(request) {
 	// Tests for /extern/update-values
 	var updateValuesTestData = {
 		route : "/extern/update-values",
+		type : "POST",
 		tests: [{
 			description : "Testing a regular value without spaces",
-			query: {source: "wwwtestse", value : {value:"FunnyValuez"}},
+			body: {source: "wwwtestse", value : {value:"FunnyValuez"}},
 			expectedResponse : {value:"FunnyValuez"}
 		},
 		{
 			description : "Testing a sentence with spaces and some special chars",
-			query: {source: "wwwtestse", value : {value:"A random sentence with some random words! :)"}},
+			body: {source: "wwwtestse", value : {value:"A random sentence with some random words! :)"}},
 			expectedResponse : {value:"A random sentence with some random words! :)"}
 		},
 		{
 			description : "Testing a value containing numbers without spaces",
-			query: {source: "wwwtestse", value : {value:"0001000593827123"}},
+			body: {source: "wwwtestse", value : {value:"0001000593827123"}},
 			expectedResponse : {value:"0001000593827123"}
 		},
 		{
 			description : "Mixing words, special chars and swedish characters",
-			query: {source: "wwwtestse", value : {value:"Mixing some words (åäö) and numbers like 010 43824 19!## - -"}},
+			body: {source: "wwwtestse", value : {value:"Mixing some words (åäö) and numbers like 010 43824 19!## - -"}},
 			expectedResponse : {value:"Mixing some words (åäö) and numbers like 010 43824 19!## - -"}
 		},
 		{
 			description : "Empty value",
-			query: {source: "wwwtestse", value : {value:""}},
+			body: {source: "wwwtestse", value : {value:""}},
 			expectedResponse : {value:""}
 		},
 		{
 			description : "Empty spaces in value",
-			query: {source: "wwwtestse", value : {value:"      "}},
+			body: {source: "wwwtestse", value : {value:"      "}},
 			expectedResponse : {value:"      "}
 		},
 		{
 			description : "Using collection name containing special chars",
-			query: {source: "www.test.se", value: {value:"Collection named with special characters like a URL"}},
+			body: {source: "www.test.se", value: {value:"Collection named with special characters like a URL"}},
 			expectedResponse : {value:"Collection named with special characters like a URL"}
 		},
 		{
 			description : "No value attribute specified",
-			query: {source: "wwwtestse"},
+			body: {source: "wwwtestse"},
 			expectedResponse : {error: 1},
 			expectedStatusCode: 400
 		},
 		{
-			description : "No query variables/attributes specified at all (no source or value)",
-			query: {},
+			description : "No body variables/attributes specified at all (no source or value)",
+			body: {},
 			expectedResponse : {error: 1},
 			expectedStatusCode: 400
 		}]
 	};
 
 	describe("Testing route (GET): /extern/update-values", function () {
-		testGET(updateValuesTestData);
+		testRequest(updateValuesTestData);
 	});
 
 
@@ -214,7 +214,7 @@ module.exports = function(request) {
 			done();
 		});
 
-		testGET(updateValuesTestDataIntern);
+		testRequest(updateValuesTestDataIntern);
 	});
 
 

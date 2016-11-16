@@ -16,22 +16,28 @@ var appRouter = function(app, upload, http, logger) {
 	*
 	*/
 	app.post("/extern/update-values/", upload.array(), function(req, res) {
-		logger.log('debug', "source: " + req.body.source + "value: " + req.body.value);
 		try {
+			var source = req.body.source;
+			source = source.replace(/[^A-Za-z0-9]/g, '');
 
-			var sourceFormated = req.body.source; 
-			sourceFormated = sourceFormated.replace(/[^A-Za-z0-9]/g, '');
-			console.log("source: " + req.body.source + "sourceFormated: " + sourceFormated);
+			var value = req.body.value;
+
+			if (typeof value === 'undefined') {
+				var error = databaseHandler.generateErrorObject("You have to specify a value!", "No value specified...");
+				res.status(400).send(error);
+			}
 			
-			var value = {value: req.body.value};
+			var result = databaseHandler.AddSourceValue(value, source);
 
-			var result = databaseHandler.AddSourceValue(value, sourceFormated);
 			var response = {};
-			
+
 			response["result"] = result;
 
-			logger.log('debug', response);
-			res.status(200).send(response);
+			if (result.error) {
+				res.status(400).send(result);
+				logger.log('debug', result);
+			} else
+				res.status(200).send(response);
 		}
 		catch(e) {
 			var response = {};
