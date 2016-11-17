@@ -4,10 +4,10 @@
   "description": "A server for the Sims dewire group",
   "main": "index.js",
   "scripts": {
-    "start": "concurrently --kill-others \"npm run mongodb\" \"npm run server\"",
-    "mongodb": "echo 'Please make sure MongoDB is installed' && mongod --dbpath data/db/ && mkdir -p logs/",
+    "start": "concurrently --kill-others \"node mkdirp.js\" \"npm run mongodb\" \"npm run server\"",
+    "mongodb": "echo 'Please make sure MongoDB is installed' && mongod --dbpath data/db/",
     "server": "echo 'Starting app.js.' && node app.js",
-    "test": "mkdir -p logs/ && mocha test/index.js"
+    "test": "node mkdirp.js && mocha test/index.js"
   },
   "author": "Sims dewire",
   "license": "ISC",
