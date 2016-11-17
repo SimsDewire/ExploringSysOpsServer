@@ -185,7 +185,8 @@ var appRouter = function(app, upload, http, logger) {
 	app.post("/intern/add-source", upload.array(), function(req, res) {
 		try {
 			var source = {URL: req.body.source};
-			
+			source.URL = source.URL.replace(/[^A-Za-z0-9]/g, '');
+
 			var result = databaseHandler.AddSource(source);
 			var response = {};
 
