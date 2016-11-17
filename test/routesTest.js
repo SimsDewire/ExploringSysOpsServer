@@ -170,7 +170,7 @@ module.exports = function(request) {
 		}]
 	};
 
-	describe("Testing route (GET): /extern/update-values", function () {
+	describe("Testing route (POST): /extern/update-values", function () {
 		testRequest(updateValuesTestData);
 	});
 
@@ -219,4 +219,48 @@ module.exports = function(request) {
 
 
 	// Quick-TODO: Clear the wwwtestse table so it doesn't persist after test is done?
+
+
+
+	// --------------------------
+	// TEST ROUTE #3
+	// --------------------------
+	// Tests for /intern/add-source
+	var addSourceTestData = {
+		route : "/intern/add-source",
+		type : "POST",
+		tests: [{
+			description : "Adding source www.test.se",
+			body: {source: "www.test.se"},
+			expectedResponse : {URL : "www.test.se"}
+		},
+		{
+			description : "Adding source wwwtestse",
+			body: {source: "wwwtestse"},
+			expectedResponse : {URL : "wwwtestse"}
+		},
+		{
+			description : "Adding source with SPACES in name",
+			body: {source: "www test se"},
+			expectedResponse : {URL : "www test se"}
+		},
+		{
+			description : "Adding EMPTY source",
+			body: {source: ""},
+			expectedResponse : {error : 1},
+			expectedStatusCode : 400
+		},
+		{
+			description : "Adding source without specifying an URL",
+			body: {},
+			expectedResponse : {error : 1},
+			expectedStatusCode : 400
+		}]
+	};
+
+	describe("Testing route " + addSourceTestData.route + " (" + addSourceTestData.type + ")", function () {
+		testRequest(addSourceTestData);
+	});
+
+
 }

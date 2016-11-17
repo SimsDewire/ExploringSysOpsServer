@@ -176,24 +176,27 @@ var appRouter = function(app, upload, http, logger) {
 
 
 	/* app.post("/intern/add-source", upload.array(), function(req, res){})
-	*	PARAMETERS: URL, the full url to the datasource.
+	*	PARAMETERS: POST-var source, the full url to the datasource.
 	*
-	*	FUNCTION: To add a source to the "Source"-collection with url to the source.
+	*	FUNCTION: Add a source to the "Source"-collection containing url to the source.
 	*
 	*	RETURNS: BSON containing the object that was added and a HTTP status-code. 
 	*/
 	app.post("/intern/add-source", upload.array(), function(req, res) {
-		logger.log('debug', "source url: " + req.body.sourceURL);
-		try{
-			var sourceURL = {URL: req.body.source};
+		try {
+			var source = {URL: req.body.source};
 			
-			var result = databaseHandler.AddSource(sourceURL);
+			var result = databaseHandler.AddSource(source);
 			var response = {};
 
 			response["result"] = result;
 
-			logger.log('debug', response);
-			res.status(200).send(response);		
+			if (typeof req.body.source === 'undefined' || source.URL == "") {
+				var newResponse = databaseHandler.generateErrorObject("Could not add empty URL", "");
+				logger.log('debug', newResponse);
+				res.status(400).send(newResponse);
+			} else	
+				res.status(200).send(response);		
 		} catch(e) {
 			var response = {};
 			response["result"] = {error: 1, message : "Something went wrong!"};
