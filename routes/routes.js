@@ -205,36 +205,6 @@ var appRouter = function(app, upload, http, logger) {
 		}
 	});
 
-
-
-	/** TESTING **/
-
-	//For testing the system
-	app.get("/test", function(req, res) {});
-
-	//Test for GET with parameter
-	app.get("/get/:id", function(req, res) {
-		logger.log(req.body+"\n"+req.ip+"\n");
-		res.send("your id is: " + req.params.id);
-	});
-
-	//Test for POST
-	app.post('/posting/', upload.array(), function (req, res, next) {
-		logger.log(req.body);
-		logger.log(req.ip);
-		
-		res.json(req.body);
-	});
-
-
-	app.post('/addition', function(req, res, next) {
-		var response = {};
-		
-		response["result"] = {"result" : parseInt(req.body.num1) + parseInt(req.body.num2)};
-
-		res.status(200).send(response);
-	});
-
 }
  
 module.exports = appRouter;

@@ -232,7 +232,7 @@ module.exports = function(request) {
 		tests: [{
 			description : "Adding source www.test.se",
 			body: {source: "www.test.se"},
-			expectedResponse : {URL : "www.test.se"}
+			expectedResponse : {URL : "wwwtestse"}
 		},
 		{
 			description : "Adding source wwwtestse",
@@ -242,7 +242,12 @@ module.exports = function(request) {
 		{
 			description : "Adding source with SPACES in name",
 			body: {source: "www test se"},
-			expectedResponse : {URL : "www test se"}
+			expectedResponse : {URL : "wwwtestse"}
+		},
+		{
+			description : "Adding source with numbers",
+			body: {source: "192.168.0.1"},
+			expectedResponse : {URL : "19216801"}
 		},
 		{
 			description : "Adding EMPTY source",
