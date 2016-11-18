@@ -2,10 +2,10 @@ var express = require("express");
 var bodyParser = require("body-parser");
 var multer = require("multer"); // v1.0.5
 var http = require("http");
-var winston = require('winston');
+var winston = require("winston");
 var upload = multer(); // for parsing multipart/form-data
 var app = express();
-
+require("./git-server.js")(app);
 
 // parse application/json
 app.use(bodyParser.json());

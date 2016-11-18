@@ -7,6 +7,8 @@
     "start": "concurrently --kill-others \"npm run mongodb\" \"npm run server\"",
     "mongodb": "echo 'Please make sure MongoDB is installed' && node mkdirp.js && mongod --dbpath data/db/",
     "server": "echo 'Starting app.js.' && node app.js",
+    "startWithDummy": "concurrently --kill-others \"npm run mongodb\" \"npm run server\" \"npm run dummyDataSources\"",
+    "dummyDataSources": "echo 'Starting test/testapier.js.' && node test/testapier.js",
     "test": "node mkdirp.js && mocha test/index.js"
   },
   "author": "Sims dewire",
