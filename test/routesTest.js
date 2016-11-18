@@ -170,7 +170,7 @@ module.exports = function(request) {
 		}]
 	};
 
-	describe("Testing route (GET): /extern/update-values", function () {
+	describe("Testing route (POST): /extern/update-values", function () {
 		testRequest(updateValuesTestData);
 	});
 
@@ -219,4 +219,95 @@ module.exports = function(request) {
 
 
 	// Quick-TODO: Clear the wwwtestse table so it doesn't persist after test is done?
+
+
+
+	// --------------------------
+	// TEST ROUTE #3
+	// --------------------------
+	// Tests for /intern/add-source
+	var addSourceTestData = {
+		route : "/intern/add-source",
+		type : "POST",
+		tests: [{
+			description : "Adding source www.test.se",
+			body: {source: "www.test.se"},
+			expectedResponse : {URL : "wwwtestse"}
+		},
+		{
+			description : "Adding source wwwtestse",
+			body: {source: "wwwtestse"},
+			expectedResponse : {URL : "wwwtestse"}
+		},
+		{
+			description : "Adding source with SPACES in name",
+			body: {source: "www test se"},
+			expectedResponse : {URL : "wwwtestse"}
+		},
+		{
+			description : "Adding source with numbers",
+			body: {source: "192.168.0.1"},
+			expectedResponse : {URL : "19216801"}
+		},
+		{
+			description : "Adding EMPTY source",
+			body: {source: ""},
+			expectedResponse : {error : 1},
+			expectedStatusCode : 400
+		},
+		{
+			description : "Adding source without specifying an URL",
+			body: {},
+			expectedResponse : {error : 1},
+			expectedStatusCode : 400
+		}]
+	};
+
+	describe("Testing route " + addSourceTestData.route + " (" + addSourceTestData.type + ")", function () {
+		testRequest(addSourceTestData);
+	});
+
+
+
+	// --------------------------
+	// TEST ROUTE #4
+	// --------------------------
+	// Tests for /intern/update-value-latest/:sourceURL/:numLimit
+	var updateValueLatestTestData = {
+		route : "/intern/update-value-latest",
+		type : "GET",
+		tests: [{
+			description : "Getting the first value (numLimit = 1)",
+			params: {sourceURL: "wwwtestse", numLimit : 1},
+			expectedResponse : {} // TODO: Might want to check value from Test #2 later, MAYBE...
+		},
+		{
+			description : "Getting the first 15 values (numLimit = 15)",
+			params: {sourceURL: "wwwtestse", numLimit : 15},
+			expectedResponse : {}
+		},
+		{
+			description : "Using a number in string form (numLimit = \"1\")",
+			params: {sourceURL: "wwwtestse", numLimit : "1"},
+			expectedResponse : {}
+		},
+		{
+			description : "Using a negative number as numLimit (numLimit = -5)",
+			params: {sourceURL: "wwwtestse", numLimit : -5},
+			expectedResponse : {error : 1},
+			expectedStatusCode : 400
+		},
+		{
+			description : "Using a string value containing non-numbers as numLimit (numLimit = \"hellodawg\")",
+			params: {sourceURL: "wwwtestse", numLimit : "hellodawg"},
+			expectedResponse : {error : 1},
+			expectedStatusCode : 400
+		}]
+	};
+
+	describe("Testing route " + updateValueLatestTestData .route + " (" + updateValueLatestTestData .type + ")", function () {
+		testRequest(updateValueLatestTestData );
+	});
+
+
 }
