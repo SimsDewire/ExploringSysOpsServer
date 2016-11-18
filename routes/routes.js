@@ -120,27 +120,43 @@ var appRouter = function(app, upload, http, logger) {
 
 
 	/** INTERN SOURCES **/
-	
-	//get latest data, get list of plugins, get one plugins files(data, zip and what not).
+	// get latest data, get list of plugins, get one plugins files(data, zip and what not).
 
-	/* app.get("/intern/update-value-latest/:sourceURL", function(req, res)
+
+	/* app.get("/intern/update-value-latest/:sourceURL/:numLimit", function(req, res)
 	*	PARAMETERS: sourceURL, the name of the datasource where the data should be found.
+	*				numLimit, the number of objects that should be returned.
+	*	FUNCTION: latest values from a certain source, specified by the caller.
 	*
-	*	FUNCTION: returns the latest value from a certain source specified by the caller.
-	*
-	*	RETURNS: BSON containing the latest value.
+	*	RETURNS: BSON containing the 'numLimit' amount of latest values.
 	*/
-	app.get("/intern/update-value-latest/:sourceURL/:numLimit", function(req, res){
-		logger.log('debug', "sourceURL: " + req.params.sourceURL + "\nnumLimit" + req.params.numLimit);
+	app.get("/intern/update-value-latest/:sourceURL/:numLimit", function(req, res) {
+		var sourceURL = req.params.sourceURL;
+		var numLimit = req.params.numLimit;
 
-		databaseHandler.GetSourceValueLatest(req.params.sourceURL, req.params.numLimit).then(function(result) {
-											var response = {};
+		var source = sourceURL.replace(/[^A-Za-z0-9]/g, '');
 
-											response["result"] = result;
+		// First check that numlimit actually is a valid and non-negative number before sending to database API
+		var tempNum = parseInt(numLimit);
+		if (isNaN(tempNum)) {
+			logger.log('debug', "Specify a valid number for numLimit!");
+			res.status(400).send({result : {error : 1, message : "Specify a valid number for numLimit!"} });
+		} else if (tempNum < 0) {
+			logger.log('debug', "Can't use a negative number!");
+			res.status(400).send({result : {error : 1, message : "Can't use a negative number!"} });	
+		}
 
-											logger.log('debug', JSON.stringify(response));
-											res.status(200).send(response);
-										});
+		// Try to find value from database
+		try {
+			databaseHandler.GetSourceValueLatest(source, numLimit).then(function(result) {
+				var response = {};
+				response["result"] = result;
+
+				res.status(200).send(response);
+			});
+		} catch(e) {
+			res.status(400).send({result : {error : 1, message : "Something went wrong when finding latest value!"} });	
+		}
 	});
 
 
@@ -176,59 +192,33 @@ var appRouter = function(app, upload, http, logger) {
 
 
 	/* app.post("/intern/add-source", upload.array(), function(req, res){})
-	*	PARAMETERS: URL, the full url to the datasource.
+	*	PARAMETERS: POST-var source, the full url to the datasource.
 	*
-	*	FUNCTION: To add a source to the "Source"-collection with url to the source.
+	*	FUNCTION: Add a source to the "Source"-collection containing url to the source.
 	*
 	*	RETURNS: BSON containing the object that was added and a HTTP status-code. 
 	*/
 	app.post("/intern/add-source", upload.array(), function(req, res) {
-		logger.log('debug', "source url: " + req.body.sourceURL);
-		try{
-			var sourceURL = {URL: req.body.source};
-			
-			var result = databaseHandler.AddSource(sourceURL);
+		try {
+			var source = {URL: req.body.source};
+			source.URL = source.URL.replace(/[^A-Za-z0-9]/g, '');
+
+			var result = databaseHandler.AddSource(source);
 			var response = {};
 
 			response["result"] = result;
 
-			logger.log('debug', response);
-			res.status(200).send(response);		
+			if (typeof req.body.source === 'undefined' || source.URL == "") {
+				var newResponse = databaseHandler.generateErrorObject("Could not add empty URL", "");
+				logger.log('debug', newResponse);
+				res.status(400).send(newResponse);
+			} else	
+				res.status(200).send(response);		
 		} catch(e) {
 			var response = {};
 			response["result"] = {error: 1, message : "Something went wrong!"};
 			res.status(400).send(response);
 		}
-	});
-
-
-
-	/** TESTING **/
-
-	//For testing the system
-	app.get("/test", function(req, res) {});
-
-	//Test for GET with parameter
-	app.get("/get/:id", function(req, res) {
-		logger.log(req.body+"\n"+req.ip+"\n");
-		res.send("your id is: " + req.params.id);
-	});
-
-	//Test for POST
-	app.post('/posting/', upload.array(), function (req, res, next) {
-		logger.log(req.body);
-		logger.log(req.ip);
-		
-		res.json(req.body);
-	});
-
-
-	app.post('/addition', function(req, res, next) {
-		var response = {};
-		
-		response["result"] = {"result" : parseInt(req.body.num1) + parseInt(req.body.num2)};
-
-		res.status(200).send(response);
 	});
 
 }
