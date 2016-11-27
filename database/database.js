@@ -1,12 +1,12 @@
-var mongoose = require("mongoose");
+const mongoose = require("mongoose");
 
 // Connection URL
-var url = 'mongodb://localhost:27017/myproject';
+const url = 'mongodb://localhost:27017/myproject';
 
 mongoose.Promise = global.Promise; // Remove promise warning
 mongoose.connect(url);
 
-var db = mongoose.connection;
+const db = mongoose.connection;
 
 db.on("error", console.error.bind(console, "connection error"));
 db.once("open", function(callback) {
@@ -17,9 +17,9 @@ db.once("open", function(callback) {
 /*
 ###### Load module objects from model files
 */
-var PluginModel = require('../models/Plugin.js');
-var SourceModel = require('../models/Source.js');
-var ErrorHandlerModel = require('../models/ErrorHandler.js');
+const PluginModel = require('../models/Plugin.js');
+const SourceModel = require('../models/Source.js');
+const ErrorHandlerModel = require('../models/ErrorHandler.js');
 
 
 /* generateErrorObject(errorMessage, errorJSON)
@@ -30,7 +30,7 @@ PARAMS: errorMessage, the message describing the error
 RETURNS: BSON object based on model ErrorHandlerModel
 */
 function generateErrorObject(errorMessage, errorJSON) {
-	var errorObj = new ErrorHandlerModel({error: 1, message: errorMessage, data: errorJSON});
+	const errorObj = new ErrorHandlerModel({error: 1, message: errorMessage, data: errorJSON});
 	
 	errorObj.save().catch(function(err) {
 		console.log("Could not save errorMessage to database:", err);
@@ -49,7 +49,7 @@ module.exports = {
 	*/
 	AddPlugin : function(pluginJSON) {
 		try {
-			var createdPlugin = new PluginModel(pluginJSON);
+			const createdPlugin = new PluginModel(pluginJSON);
 		
 			createdPlugin.save().then(function (res) {
 				console.log("Added plugin", res);
@@ -81,7 +81,7 @@ module.exports = {
 	*/
 	AddSource : function(sourceJSON) {
 		try {
-			var createdSource = new SourceModel(sourceJSON);
+			const createdSource = new SourceModel(sourceJSON);
 			createdSource.save().then(function (res) {
 				//console.log("Added source", res);
 			}).catch(function(err) {
@@ -112,12 +112,12 @@ module.exports = {
 	* RETURNS: BSON object created of model SourceValueModel
 	*/
 	AddSourceValue : function(sourceValueJSON, collectionName) {
-		var SourceValueModel = require('../models/SourceValues.js')(collectionName);
+		const SourceValueModel = require('../models/SourceValues.js')(collectionName);
 		
 
 			// console.log("Trying to add source value: " + sourceValueJSON + " into collection: " + collectionName);
 		try {
-			var createdSourceValue = new SourceValueModel(sourceValueJSON);
+			const createdSourceValue = new SourceValueModel(sourceValueJSON);
 		
 			createdSourceValue.save().then(function (res) {
 
@@ -142,7 +142,7 @@ module.exports = {
 	* RETURNS: BSON containing all the search results
 	*/
 	FindSourceValue : function(startDate, endDate, collectionName) {
-		var SourceValueModel = require('../models/SourceValues.js')(collectionName);
+		const SourceValueModel = require('../models/SourceValues.js')(collectionName);
 		
 		return SourceValueModel.find({createdAt : {'$gte' : startDate, '$lte' : endDate}}).then(function (result) {
 			return result;
@@ -158,7 +158,7 @@ module.exports = {
 	* RETURNS: BSON containing the data objects.
 	*/
 	GetSourceValueLatest : function(collectionName, numLimit) {
-		var SourceValueModel = require('../models/SourceValues.js')(collectionName);
+		const SourceValueModel = require('../models/SourceValues.js')(collectionName);
 
 		return SourceValueModel.find({}).sort('-createdAt').limit(parseInt(numLimit)).then(function (result) {
 			return result;

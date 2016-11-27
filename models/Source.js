@@ -1,6 +1,6 @@
-var mongoose = require("./mongooseExtended");
+const mongoose = require("./mongooseExtended");
 
-var SourceSchema = new mongoose.Schema({
+const SourceSchema = new mongoose.Schema({
 	URL : {type: String, unique: true, dropDups: true},
 	updatedAt : { type: Date, default: Date.now },
 	pluginID : mongoose.Schema.Types.ObjectId
@@ -9,6 +9,6 @@ var SourceSchema = new mongoose.Schema({
 // Force name of the collection to avoid standard naming
 SourceSchema.set('collection', 'Source');
 
-var SourceModel = mongoose.model('Source', SourceSchema);
+const SourceModel = mongoose.model('Source', SourceSchema);
 
 module.exports = SourceModel;

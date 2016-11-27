@@ -1,6 +1,6 @@
-var mongoose = require("./mongooseExtended");
+const mongoose = require("./mongooseExtended");
 
-var PluginSchema = new mongoose.Schema({
+const PluginSchema = new mongoose.Schema({
 	name : String,
 	description : String,
 	creator : String,
@@ -12,6 +12,6 @@ var PluginSchema = new mongoose.Schema({
 // Force name of the collection to avoid standard naming
 PluginSchema.set('collection', 'Plugin');
 
-var PluginModel = mongoose.model('Plugin', PluginSchema);
+const PluginModel = mongoose.model('Plugin', PluginSchema);
 
 module.exports = PluginModel;

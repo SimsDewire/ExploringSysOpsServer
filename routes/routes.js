@@ -1,6 +1,8 @@
-var appRouter = function(app, upload, http, logger) {
+"use strict";
 
-	var databaseHandler = require('./../database/database.js');
+module.exports = function(app, upload, http, logger) {
+
+	const databaseHandler = require('./../database/database.js');
 
 	/** EXTERN SOURCES **/
 
@@ -17,30 +19,27 @@ var appRouter = function(app, upload, http, logger) {
 	*/
 	app.post("/extern/update-values/", upload.array(), function(req, res) {
 		try {
-			var source = req.body.source;
-			source = source.replace(/[^A-Za-z0-9]/g, '');
-
-			var value = req.body.value;
+			const source = req.body.source.replace(/[^A-Za-z0-9]/g, '');
+			const value = req.body.value;
 
 			if (typeof value === 'undefined') {
-				var error = databaseHandler.generateErrorObject("You have to specify a value!", "No value specified...");
+				const error = databaseHandler.generateErrorObject("You have to specify a value!", "No value specified...");
 				res.status(400).send(error);
+			} else {
+				const result = databaseHandler.AddSourceValue(value, source);
+
+				let response = {};
+				response["result"] = result;
+
+				if (result.error) {
+					res.status(400).send(result);
+					logger.log('debug', result);
+				} else
+					res.status(200).send(response);
 			}
-			
-			var result = databaseHandler.AddSourceValue(value, source);
-
-			var response = {};
-
-			response["result"] = result;
-
-			if (result.error) {
-				res.status(400).send(result);
-				logger.log('debug', result);
-			} else
-				res.status(200).send(response);
 		}
 		catch(e) {
-			var response = {};
+			let response = {};
 			response["result"] = {error: 1, message: "Could not handle the request params"};
 			res.status(400).send(response);
 		}
@@ -60,7 +59,7 @@ var appRouter = function(app, upload, http, logger) {
 		logger.log('debug', "CALL: ");
 
 		//A JSON object that contains all data to access a remote API.
-		var options = {
+		const options = {
 			hostname: req.body.sourceURL,
 			port: req.body.port,
 			path: req.body.path,
@@ -70,13 +69,13 @@ var appRouter = function(app, upload, http, logger) {
 		logger.log('debug', options);
 
 		//Require data from a specified source API, the data is stored in 'chunk'.
-		var require = http.request(options, (result) => {
+		const require = http.request(options, (result) => {
 			logger.log('debug', 'STATUS: '+ result.statusCode);
 			logger.log('debug', 'HEADERS: '+ JSON.stringify(result.headers));
 			
 			result.setEncoding('utf8')
 
-			var collectionName = (req.body.sourceURL + req.body.port + req.body.path);
+			const collectionName = (req.body.sourceURL + req.body.port + req.body.path);
 
 			//Format the collectionname so it will not contain any special characters and then log into 'debug'.
 			collectionName = collectionName.replace(/[^A-Za-z0-9]/g, '');
@@ -87,14 +86,14 @@ var appRouter = function(app, upload, http, logger) {
 
 				//Format the data-chunk so that the database understands the value.
 				chunk = JSON.parse(chunk);
-				var value = JSON.parse("{\"value\": \"" + chunk.result[0].value + "\"}");
+				const value = {value : chunk.result[0].value};
 				
 				//Logg the data-chunk and the collection-name.
 				logger.log('debug', 'BODY: '+ chunk);
 				logger.log('debug', 'COLLECTION NAME2: ' +  collectionName);
 
 				//Store the value of the chunk into the database and log the response to 'debug'.
-				var dbResponse = databaseHandler.AddSourceValue(value, collectionName.replace(/[^A-Za-z0-9]/g, ''));
+				const dbResponse = databaseHandler.AddSourceValue(value, collectionName.replace(/[^A-Za-z0-9]/g, ''));
 				logger.log('debug', "Database response: " + dbResponse);
 				
 				//Return the data-chunk to from where it was sent.
@@ -131,13 +130,13 @@ var appRouter = function(app, upload, http, logger) {
 	*	RETURNS: BSON containing the 'numLimit' amount of latest values.
 	*/
 	app.get("/intern/update-value-latest/:sourceURL/:numLimit", function(req, res) {
-		var sourceURL = req.params.sourceURL;
-		var numLimit = req.params.numLimit;
+		const sourceURL = req.params.sourceURL;
+		const numLimit = req.params.numLimit;
 
-		var source = sourceURL.replace(/[^A-Za-z0-9]/g, '');
+		const source = sourceURL.replace(/[^A-Za-z0-9]/g, '');
 
 		// First check that numlimit actually is a valid and non-negative number before sending to database API
-		var tempNum = parseInt(numLimit);
+		const tempNum = parseInt(numLimit);
 		if (isNaN(tempNum)) {
 			logger.log('debug', "Specify a valid number for numLimit!");
 			res.status(400).send({result : {error : 1, message : "Specify a valid number for numLimit!"} });
@@ -149,7 +148,7 @@ var appRouter = function(app, upload, http, logger) {
 		// Try to find value from database
 		try {
 			databaseHandler.GetSourceValueLatest(source, numLimit).then(function(result) {
-				var response = {};
+				let response = {};
 				response["result"] = result;
 
 				res.status(200).send(response);
@@ -171,19 +170,18 @@ var appRouter = function(app, upload, http, logger) {
 	app.get("/intern/update-values/", function(req, res) {
 		logger.log('debug', req.params.sourceURL);
 
+		let response = {};
+
 		try {
 			databaseHandler.FindSourceValue(new Date(req.query.from), 
 											new Date(req.query.to), 
 											req.query.sourceURL).then(function(result) {
-												var response = {};
-
 												response["result"] = result;
 
 												logger.log('debug', response);
 												res.status(200).send(response);
 											});
 		} catch(e) {
-			var response = {};
 			response["result"] = {error: 1, message : "Something went wrong!"};
 			res.status(400).send(response);
 		}
@@ -199,23 +197,23 @@ var appRouter = function(app, upload, http, logger) {
 	*	RETURNS: BSON containing the object that was added and a HTTP status-code. 
 	*/
 	app.post("/intern/add-source", upload.array(), function(req, res) {
+		let response = {};
+
 		try {
-			var source = {URL: req.body.source};
+			const source = {URL: req.body.source};
 			source.URL = source.URL.replace(/[^A-Za-z0-9]/g, '');
 
-			var result = databaseHandler.AddSource(source);
-			var response = {};
+			const result = databaseHandler.AddSource(source);
 
 			response["result"] = result;
 
 			if (typeof req.body.source === 'undefined' || source.URL == "") {
-				var newResponse = databaseHandler.generateErrorObject("Could not add empty URL", "");
+				const newResponse = databaseHandler.generateErrorObject("Could not add empty URL", "");
 				logger.log('debug', newResponse);
 				res.status(400).send(newResponse);
 			} else	
 				res.status(200).send(response);		
 		} catch(e) {
-			var response = {};
 			response["result"] = {error: 1, message : "Something went wrong!"};
 			res.status(400).send(response);
 		}
@@ -223,4 +221,3 @@ var appRouter = function(app, upload, http, logger) {
 
 }
  
-module.exports = appRouter;

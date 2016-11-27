@@ -1,6 +1,6 @@
-var mongoose = require("./mongooseExtended");
+const mongoose = require("./mongooseExtended");
 
-var SourceValuesSchema = new mongoose.Schema({
+const SourceValuesSchema = new mongoose.Schema({
 	value : String,
 	createdAt : { type: Date, default: Date.now }
 }, {strict: "throw", versionKey: false});
@@ -9,7 +9,7 @@ var SourceValuesSchema = new mongoose.Schema({
 module.exports = function(name) {
 	SourceValuesSchema.set('collection', name);
 
-	var SourceValuesModel = mongoose.model(name, SourceValuesSchema);
+	const SourceValuesModel = mongoose.model(name, SourceValuesSchema);
 		
 	return SourceValuesModel;
 };

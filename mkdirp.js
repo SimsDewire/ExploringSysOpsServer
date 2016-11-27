@@ -1,4 +1,4 @@
-var mkdirp = require('mkdirp');
+const mkdirp = require('mkdirp');
     
 // Create folder logs/
 mkdirp('logs', function (err) {

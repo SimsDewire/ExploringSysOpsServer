@@ -1,7 +1,8 @@
+"use strict";
+
 process.env.NODE_ENV = 'test';
 
 module.exports = function(request) {
-	var responseData = [];
 
 	/* testRequest(data)
 	PARAMS: expected a JSON object as parameter, with the following attributes:
@@ -30,20 +31,20 @@ module.exports = function(request) {
 		}
 	*/
 	function testRequest(data) {
-		var tempData = [];
-		var type =( data.type || "GET").toLowerCase();
+		let tempData = [];
+		const type =( data.type || "GET").toLowerCase();
 
 		data.tests.forEach(function(testCase) {
 
 			it(testCase.description, function(done) {
 				// Add parameters in such a way that they are added after / in the route
-				var paramsStr = "";
+				let paramsStr = "";
 				if(typeof testCase.params == "object")
-					for (var i in testCase.params) 
+					for (let i in testCase.params) 
 						paramsStr += ("/" + ((typeof testCase.params[i] == 'object') ? JSON.stringify(testCase.params[i]) : testCase.params[i]));
 				if(typeof testCase.query == "object") {
 					paramsStr = "?";
-					for (var i in testCase.query) {
+					for (let i in testCase.query) {
 						if(paramsStr !== "?")	
 							paramsStr += "&";
 						paramsStr += i + "=" + encodeURIComponent(((typeof testCase.query[i] == 'object') ? JSON.stringify(testCase.query[i]) : testCase.query[i]));
@@ -62,7 +63,7 @@ module.exports = function(request) {
 			            res.body.result.should.be.json;
 
 			            // Loop trough each property of expectedResponse and check that they are correct
-			            for (var val in testCase.expectedResponse) {
+			            for (let val in testCase.expectedResponse) {
 			            	if (typeof testCase.expectedResponse[val] == "undefined")
 			            		res.body.result.should.not.have.property(val);
 			            	else
@@ -77,48 +78,12 @@ module.exports = function(request) {
 		});
 	}
 
-	/* testPOST(data)
-	PARAMS: expected a JSON object as parameter, with the following attributes:
-			route - The route to test, for example: route : "/extern/add"
-			tests - An array containing different tests, this array contains JSON objects with the attributes: 'param' and 'expectedResponse'
-							params - The parameters to send in the POST request. Example: {a : 5, b : 7} will send a=5&b=7
-
-							expectedResponse - A JSON object containing all expected values the tested route should return as response
-							   					Example: {A : 8, B : 9} will expect that the response contains a JSON object with AT LEAST A=8 and B=9 as attributes
-	*/
-	function testPOST(data) {
-		describe("Testing route (POST): " + data.route, function() {
-
-			for (var test in data.tests) {
-				var testCase = data.tests[test];
-
-			    it("Using params: " + JSON.stringify(testCase.params), function(done) {
-			        request
-			        	.post(data.route)
-			        	.type('form')
-			        	.send(testCase.params)
-			        	.expect('Content-Type', /json/)
-			            .end(function(err, res) {
-			            	res.status.should.equal(200);
-			            	res.error.should.equal(false);
-
-			            	for (var val in testCase.expectedResponse)
-			            		res.body.result[val].should.equal(testCase.expectedResponse[val]);
-
-			            	done();
-			        });
-			    });
-			}
-
-
-		});
-	}
 
 	// --------------------------
 	// TEST ROUTE #1
 	// --------------------------
 	// Tests for /extern/update-values
-	var updateValuesTestData = {
+	const updateValuesTestData = {
 		route : "/extern/update-values",
 		type : "POST",
 		tests: [{
@@ -181,7 +146,7 @@ module.exports = function(request) {
 	// --------------------------
 	// Tests for /intern/update-values
 	describe("Testing route (GET): /intern/update-values", function () {
-		var updateValuesTestDataIntern = {
+		const updateValuesTestDataIntern = {
 			route : "/intern/update-values",
 			tests: [{
 				description : "Check that all values from previous tests is returned in specified date range",
@@ -192,21 +157,21 @@ module.exports = function(request) {
 
 		before(function(done) {
 			// Get all createdAt responses from the last test
-			responseData = updateValuesTestData.tests.filter(function (test) {
+			let responseData = updateValuesTestData.tests.filter(function (test) {
 				return !test.result.error;
 			})
 			.map(function(test) {
 				return test.result;
 			});
-			createdDates = responseData.map(function (test) {
+			let createdDates = responseData.map(function (test) {
 				return new Date(test.createdAt);
 			});
 
 			// Need to set some attributes of the test data here
 			updateValuesTestDataIntern.tests.forEach(function (test) {
 				test.expectedResponse = responseData;
-				var dateFrom = new Date(Math.min.apply(null, createdDates));
-				var dateTo = new Date(Math.max.apply(null, createdDates));
+				const dateFrom = new Date(Math.min.apply(null, createdDates));
+				const dateTo = new Date(Math.max.apply(null, createdDates));
 				test.query.from = dateFrom.toISOString();
 				test.query.to = dateTo.toISOString();
 			});
@@ -226,7 +191,7 @@ module.exports = function(request) {
 	// TEST ROUTE #3
 	// --------------------------
 	// Tests for /intern/add-source
-	var addSourceTestData = {
+	const addSourceTestData = {
 		route : "/intern/add-source",
 		type : "POST",
 		tests: [{
@@ -273,7 +238,7 @@ module.exports = function(request) {
 	// TEST ROUTE #4
 	// --------------------------
 	// Tests for /intern/update-value-latest/:sourceURL/:numLimit
-	var updateValueLatestTestData = {
+	const updateValueLatestTestData = {
 		route : "/intern/update-value-latest",
 		type : "GET",
 		tests: [{

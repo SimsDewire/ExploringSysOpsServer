@@ -1,6 +1,6 @@
-var mongoose = require("./mongooseExtended");
+const mongoose = require("./mongooseExtended");
 
-var ErrorHandlerSchema = new mongoose.Schema({
+const ErrorHandlerSchema = new mongoose.Schema({
 	error : String,
 	message : String,
 	data : Object // the data showing what was handled at the moment of error
@@ -9,6 +9,6 @@ var ErrorHandlerSchema = new mongoose.Schema({
 // Force name of the collection to avoid standard naming
 ErrorHandlerSchema.set('collection', 'ErrorHandler');
 
-var ErrorHandlerModel = mongoose.model('ErrorHandler', ErrorHandlerSchema);
+const ErrorHandlerModel = mongoose.model('ErrorHandler', ErrorHandlerSchema);
 
 module.exports = ErrorHandlerModel;
