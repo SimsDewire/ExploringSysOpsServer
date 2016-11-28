@@ -280,7 +280,7 @@ module.exports = function(request) {
 	// TEST ROUTE #5
 	// --------------------------
 	// Tests for /extern/request-values/
-	var requestValueTestData = {
+	const requestValueTestData = {
 		route : "/extern/request-values/",
 		type : "POST",
 		tests: [{

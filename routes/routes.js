@@ -71,49 +71,32 @@ module.exports = function(app, upload, http, logger) {
 		//Require data from a specified source API, the data is stored in 'chunk'.
 		const require = http.request(options, (result) => {			
 			result.setEncoding('utf8')
-
-			const collectionName = (req.body.sourceURL + req.body.port + req.body.path);
-
-			//Format the collectionname so it will not contain any special characters and then log into 'debug'.
-			collectionName = collectionName.replace(/[^A-Za-z0-9]/g, '');
-
+			
+			//Format the collectionname so it will not contain any special characters.
+			const collectionName = (req.body.sourceURL + req.body.port + req.body.path).replace(/[^A-Za-z0-9]/g, '');
 
 			//When data is recieved.
 			result.on('data', (chunk) => {
 				try{
 
-					//Format the data-chunk so that the database understands the value.
 					chunk = JSON.parse(chunk);
-					var value = JSON.parse("{\"value\": \"" + chunk.result[0].value + "\"}");
+
+					const value = {value : chunk.result[0].value};
 
 					//Logg the data-chunk and the collection-name.
 					logger.log('debug', 'BODY: '+ chunk);
+					logger.log('debug', 'COLLECTION NAME: ' +  collectionName);
 
 					//Store the value of the chunk into the database and log the response to 'debug'.
-					var dbResponse = databaseHandler.AddSourceValue(value, collectionName);
+					const dbResponse = databaseHandler.AddSourceValue(value, collectionName);
 					logger.log('debug', "Database response: " + dbResponse);
-					
+
 					//Return the data-chunk to from where it was sent.
 					res.status(200).send(chunk);
 
 				} catch(e){
 					res.status(400).send({result : {error : 1, message : "Path unavailable!"}});
-				}						
-
-				//Format the data-chunk so that the database understands the value.
-				chunk = JSON.parse(chunk);
-				const value = {value : chunk.result[0].value};
-				
-				//Logg the data-chunk and the collection-name.
-				logger.log('debug', 'BODY: '+ chunk);
-				logger.log('debug', 'COLLECTION NAME: ' +  collectionName);
-
-				//Store the value of the chunk into the database and log the response to 'debug'.
-				const dbResponse = databaseHandler.AddSourceValue(value, collectionName.replace(/[^A-Za-z0-9]/g, ''));
-				logger.log('debug', "Database response: " + dbResponse);
-				
-				//Return the data-chunk to from where it was sent.
-				res.status(200).send(chunk);
+				}
 			});
 
 			//When no more data is recieved.
