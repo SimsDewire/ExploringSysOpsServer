@@ -67,22 +67,38 @@ module.exports = function(app, upload, http, logger) {
 		};
 		//Writes in the conolse what was required. 
 		logger.log('debug', options);
-
+		
 		//Require data from a specified source API, the data is stored in 'chunk'.
-		const require = http.request(options, (result) => {
-			logger.log('debug', 'STATUS: '+ result.statusCode);
-			logger.log('debug', 'HEADERS: '+ JSON.stringify(result.headers));
-			
+		const require = http.request(options, (result) => {			
 			result.setEncoding('utf8')
 
 			const collectionName = (req.body.sourceURL + req.body.port + req.body.path);
 
 			//Format the collectionname so it will not contain any special characters and then log into 'debug'.
 			collectionName = collectionName.replace(/[^A-Za-z0-9]/g, '');
-			logger.log('debug', 'COLLECTION NAME1: ' +  collectionName);
+
 
 			//When data is recieved.
 			result.on('data', (chunk) => {
+				try{
+
+					//Format the data-chunk so that the database understands the value.
+					chunk = JSON.parse(chunk);
+					var value = JSON.parse("{\"value\": \"" + chunk.result[0].value + "\"}");
+
+					//Logg the data-chunk and the collection-name.
+					logger.log('debug', 'BODY: '+ chunk);
+
+					//Store the value of the chunk into the database and log the response to 'debug'.
+					var dbResponse = databaseHandler.AddSourceValue(value, collectionName);
+					logger.log('debug', "Database response: " + dbResponse);
+					
+					//Return the data-chunk to from where it was sent.
+					res.status(200).send(chunk);
+
+				} catch(e){
+					res.status(400).send({result : {error : 1, message : "Path unavailable!"}});
+				}						
 
 				//Format the data-chunk so that the database understands the value.
 				chunk = JSON.parse(chunk);
@@ -90,7 +106,7 @@ module.exports = function(app, upload, http, logger) {
 				
 				//Logg the data-chunk and the collection-name.
 				logger.log('debug', 'BODY: '+ chunk);
-				logger.log('debug', 'COLLECTION NAME2: ' +  collectionName);
+				logger.log('debug', 'COLLECTION NAME: ' +  collectionName);
 
 				//Store the value of the chunk into the database and log the response to 'debug'.
 				const dbResponse = databaseHandler.AddSourceValue(value, collectionName.replace(/[^A-Za-z0-9]/g, ''));
@@ -103,19 +119,27 @@ module.exports = function(app, upload, http, logger) {
 			//When no more data is recieved.
 			result.on('end', () => {
 				logger.log('debug', 'No more data in response.');
-				res.status(200).end();
 			});
 		});
+		
+		require.setTimeout(1500);
 
+		//Message on timeout.
+		require.on('timeout', (e) => {
+			res.status(400).send({result : {error : 1, message : "Timeout occured!"}});
+		});
 
 		//Message on error.
 		require.on('error', (e) => {
-			logger.log('error', 'problem with request: ' + e.message);
-			res.status(400).end("error: " + e.message)
+			if(!res._headerSent){
+				res.status(400).send({result : {error : 1, message : e.message}});
+			}
 		});
+
 		require.end();
 	});
 	
+
 
 
 	/** INTERN SOURCES **/

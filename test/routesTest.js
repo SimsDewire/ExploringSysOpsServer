@@ -275,4 +275,59 @@ module.exports = function(request) {
 	});
 
 
+
+	// --------------------------
+	// TEST ROUTE #5
+	// --------------------------
+	// Tests for /extern/request-values/
+	var requestValueTestData = {
+		route : "/extern/request-values/",
+		type : "POST",
+		tests: [{
+			description : "Calling '/intern/update-value-latest/wwwtestse/1' as if it were an external API.",
+			body: {sourceURL: "localhost", port: 3000, path: "/intern/update-value-latest/wwwtestse/1", method: "GET"},
+			expectedResponse : {}
+		},
+		{
+			description : "Calling API with incorrect path.",
+			body: {sourceURL: "localhost", port: 3000, path: "/intern/update-value-latest/1", method: "GET"},
+			expectedResponse : {},
+			expectedStatusCode : 400
+		},
+		{
+			description : "Calling API with empty path.",
+			body: {sourceURL: "localhost", port: 3000, path: "", method: "GET"},
+			expectedResponse : {},
+			expectedStatusCode : 400
+		},
+		{
+			description : "Calling API with wrong(closed) port.",
+			body: {sourceURL: "localhost", port: 4000, path: "/intern/update-value-latest/wwwtestse/1", method: "GET"},
+			expectedResponse : {},
+			expectedStatusCode : 400
+		},
+		{
+			description : "Calling API with wrong source URL.",
+			body: {sourceURL: "abds", port: 3000, path: "/intern/update-value-latest/wwwtestse/1", method: "GET"},
+			expectedResponse : {},
+			expectedStatusCode : 400
+		},
+		{
+			description : "Calling API with wrong method(POST instead of GET).",
+			body: {sourceURL: "localhost", port: 3000, path: "/intern/update-value-latest/wwwtestse/1", method: "POST"},
+			expectedResponse : {},
+			expectedStatusCode : 400
+		},
+		{
+			description : "Calling API with everything wrong.",
+			body: {sourceURL: "localhost", port: 3000, path: "/intern/update-value-latest/1", method: "POST"},
+			expectedResponse : {},
+			expectedStatusCode : 400
+		}
+		]
+	};
+
+	describe("Testing route " + requestValueTestData .route + " (" + requestValueTestData .type + ")", function () {
+		testRequest(requestValueTestData );
+	});
 }

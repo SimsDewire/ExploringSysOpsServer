@@ -50,9 +50,9 @@ module.exports = {
 	AddPlugin : function(pluginJSON) {
 		try {
 			const createdPlugin = new PluginModel(pluginJSON);
-		
+
 			createdPlugin.save().then(function (res) {
-				console.log("Added plugin", res);
+
 			}).catch(function(err) {
 				return generateErrorObject("Could not add plugin!");
 			});
@@ -70,6 +70,7 @@ module.exports = {
 	FindPlugin : function(searchJSON) {
 		return PluginModel.find(searchJSON).then(function (result) {
 			return result;
+
 		}).catch(function(err) {
 			return generateErrorObject("Could not find plugin!");
 		});
@@ -83,7 +84,7 @@ module.exports = {
 		try {
 			const createdSource = new SourceModel(sourceJSON);
 			createdSource.save().then(function (res) {
-				//console.log("Added source", res);
+
 			}).catch(function(err) {
 				return generateErrorObject("Could not add source!");
 			});
@@ -101,6 +102,7 @@ module.exports = {
 	FindSource : function(searchJSON) {
 		return SourceModel.find(searchJSON).then(function (result) {
 			return result;
+
 		}).catch(function(err) {
 			return generateErrorObject("Could not find source!");
 		});
@@ -114,14 +116,11 @@ module.exports = {
 	AddSourceValue : function(sourceValueJSON, collectionName) {
 		const SourceValueModel = require('../models/SourceValues.js')(collectionName);
 		
-
-			// console.log("Trying to add source value: " + sourceValueJSON + " into collection: " + collectionName);
 		try {
 			const createdSourceValue = new SourceValueModel(sourceValueJSON);
-		
+
 			createdSourceValue.save().then(function (res) {
 
-				// console.log("Successfully added source value " + res + " into collection " + collectionName);
 			}).catch(function(err) {
 				return generateErrorObject("Could not add source value!");
 			});
@@ -146,6 +145,7 @@ module.exports = {
 		
 		return SourceValueModel.find({createdAt : {'$gte' : startDate, '$lte' : endDate}}).then(function (result) {
 			return result;
+
 		}).catch(function(err) {
 			return generateErrorObject("Could not find data specified!");
 		});
@@ -162,6 +162,7 @@ module.exports = {
 
 		return SourceValueModel.find({}).sort('-createdAt').limit(parseInt(numLimit)).then(function (result) {
 			return result;
+
 		}).catch(function(err) {
 			return generateErrorObject("Could not find data specified!");
 		});	
