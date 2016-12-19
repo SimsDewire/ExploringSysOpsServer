@@ -78,10 +78,8 @@ module.exports = function(app, upload, http, logger) {
 			//When data is recieved.
 			result.on('data', (chunk) => {
 				try{
-
+					const value = {value : chunk};
 					chunk = JSON.parse(chunk);
-
-					const value = {value : chunk.result[0].value};
 
 					//Logg the data-chunk and the collection-name.
 					logger.log('debug', 'BODY: '+ chunk);
